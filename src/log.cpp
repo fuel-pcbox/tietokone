@@ -5,7 +5,7 @@
 uint8_t log_filter;
 std::vector<std::string> comp_filter;
 
-void log_print(std::string *component, uint8_t level, std::string *msg, ...)
+void log_print(std::string *component, log_level level, std::string *msg, ...)
 {
     if(!(level & log_filter)) return;
 
