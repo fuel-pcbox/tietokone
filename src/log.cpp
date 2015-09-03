@@ -9,9 +9,6 @@ void log_print(std::string *component, uint8_t level, std::string *msg, ...)
 {
     if(!(level & log_filter)) return;
 
-    va_list args;
-    va_start(args, msg.c_str());
-
     std::string level_str;
     switch(level)
     {
@@ -47,9 +44,12 @@ void log_print(std::string *component, uint8_t level, std::string *msg, ...)
 		if(component == comp_filter[i]) return;
 	}
 
-    std::string final_msg = "[" + component + " | " + level_str + "] " + msg + "\n";
+  std::string final_msg = "[" + component + " | " + level_str + "] " + msg + "\n";
 
-    vprintf(final_msg.c_str(), args);
+  va_list args;
+  va_start(args, msg.c_str());
 
-    va_end(args);
+  vprintf(final_msg.c_str(), args);
+
+  va_end(args);
 }
