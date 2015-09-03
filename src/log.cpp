@@ -44,7 +44,7 @@ void log_print(std::string *component, log_level level, std::string *msg, ...)
     }
     }
 
-	for(int i = 0;i<comp_filter.size();i++)
+    for(int i = 0;i<comp_filter.size();i++)
     {
         if(component == comp_filter[i]) return;
     }
