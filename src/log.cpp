@@ -37,19 +37,24 @@ void log_print(std::string *component, log_level level, std::string *msg, ...)
         level_str = "Info";
         break;
     }
+    default:
+    {
+        return;
+        break;
+    }
     }
 
 	for(int i = 0;i<comp_filter.size();i++)
-	{
-		if(component == comp_filter[i]) return;
-	}
+    {
+        if(component == comp_filter[i]) return;
+    }
 
-  std::string final_msg = "[" + component + " | " + level_str + "] " + msg + "\n";
+    std::string final_msg = "[" + component + " | " + level_str + "] " + msg + "\n";
 
-  va_list args;
-  va_start(args, msg.c_str());
+    va_list args;
+    va_start(args, msg.c_str());
 
-  vprintf(final_msg.c_str(), args);
+    vprintf(final_msg.c_str(), args);
 
-  va_end(args);
+    va_end(args);
 }
