@@ -2,14 +2,11 @@
 
 #include "log.h"
 
-static uint8_t log_filter;
-static std::vector<std::string> comp_filter;
+uint8_t log_filter;
+std::vector<std::string> comp_filter;
 
-void log_print(char *component, uint8_t level, char *msg, ...)
+void log_print(std::string *component, uint8_t level, std::string *msg, ...)
 {
-    std::string stds_component(component);
-    std::string stds_msg(msg);
-
     if(!(level & log_filter)) return;
 
     va_list args;
@@ -18,27 +15,27 @@ void log_print(char *component, uint8_t level, char *msg, ...)
     std::string level_str;
     switch(level)
     {
-    case LOG_LEVEL_ERROR:
+    case log_level::error:
     {
         level_str = "Error";
         break;
     }
-    case LOG_LEVEL_WARNING:
+    case log_level::warning:
     {
         level_str = "Warning";
         break;
     }
-    case LOG_LEVEL_DEBUG:
+    case log_level::debug:
     {
         level_str = "Debug";
         break;
     }
-    case LOG_LEVEL_VERBOSE:
+    case log_level::verbose:
     {
         level_str = "Verbose";
         break;
     }
-    case LOG_LEVEL_INFO:
+    case log_level::info:
     {
         level_str = "Info";
         break;
@@ -47,10 +44,10 @@ void log_print(char *component, uint8_t level, char *msg, ...)
 
 	for(int i = 0;i<comp_filter.size();i++)
 	{
-		if(stds_component == comp_filter[i]) return;
+		if(component == comp_filter[i]) return;
 	}
 
-    std::string final_msg = "[" + stds_component + " | " + level_str + "] " + stds_msg + "\n";
+    std::string final_msg = "[" + component + " | " + level_str + "] " + msg + "\n";
 
     vprintf(final_msg.c_str(), args);
 

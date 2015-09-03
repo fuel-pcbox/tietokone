@@ -1,21 +1,19 @@
 #pragma once
 
-#ifdef __cplusplus
 #include <cstdio>
 #include <string>
-extern "C" {
-#endif
-void log_print(char *component, uint8_t level, char *msg, ...);
-#ifdef __cplusplus
-}
-#endif
+#include <vector>
 
-#define LOG_LEVEL_ERROR		0x01
-#define LOG_LEVEL_WARNING	0x02
-#define LOG_LEVEL_DEBUG		0x04
-#define LOG_LEVEL_VERBOSE	0x08
-#define LOG_LEVEL_INFO		0x10
+enum log_level
+{
+    error = 1,
+    warning = 2,
+    debug = 4,
+    verbose = 8,
+    info = 16,
+};
 
-#ifdef __cplusplus
-#define to_string std::to_string
-#endif
+void log_print(std::string component, log_level level, std::string msg, ...);
+
+extern log_level log_filter;
+extern std::vector<std::string> comp_filter;
