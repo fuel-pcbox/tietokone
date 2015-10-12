@@ -1,5 +1,6 @@
 #include "common.h"
 #include "mem.h"
+#include "cpu.h"
 
 int main(int ac, char** av)
 {
@@ -13,8 +14,9 @@ int main(int ac, char** av)
 
     handlers.push_back(bioshandler);
 
-    u32 csbase = 0x000f0000;
-    u32 eip = 0x0000fff0;
+    cpu maincpu;
 
-    log_print("CPU", verbose, "Opcode %02x", cpu_readbyte(csbase + eip));
+    maincpu.init();
+
+    log_print("CPU", verbose, "Opcode %02x", cpu_readbyte(maincpu._cs.base + maincpu.ip));
 }

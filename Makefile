@@ -1,7 +1,7 @@
 VPATH = src
 CPP = g++.exe
 CFLAGS = -O2 -std=gnu++11 -fpermissive
-OBJ = log.o main.o mem.o
+OBJ = log.o main.o mem.o cpu.o
 
 tietokone.exe: $(OBJ)
 	$(CPP) $(OBJ) -o "tietokone.exe"
