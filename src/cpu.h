@@ -35,6 +35,7 @@ struct cpu
 
     u32 flags;
     u32 ip;
+    u16 zero;
 
     struct x86seg
     {
@@ -51,4 +52,19 @@ struct cpu
 
     u32 cr[5]; //CR1 is unused.
     u32 dr[8];
+
+    u16* modadd[2][8];
+    u32* modseg[8];
+
+    int mod;
+    int reg;
+    int rm;
+
+    u16 ea_seg_base;
+    u32 ea_addr;
+
+    void fetch_ea_16(u8 modrm);
+    void setznp16(u16 val);
+
+    void tick();
 };

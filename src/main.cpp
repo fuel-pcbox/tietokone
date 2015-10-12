@@ -18,5 +18,8 @@ int main(int ac, char** av)
 
     maincpu.init();
 
-    log_print("CPU", verbose, "Opcode %02x", cpu_readbyte(maincpu._cs.base + maincpu.ip));
+    for(int i = 0;i<50;i++)
+    {
+        maincpu.tick();
+    }
 }
