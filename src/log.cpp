@@ -1,38 +1,39 @@
+#include <cstdint>
 #include <cstdarg>
 
 #include "log.h"
 
-uint8_t log_filter;
+log_level log_filter;
 std::vector<std::string> comp_filter;
 
-void log_print(std::string *component, log_level level, std::string *msg, ...)
+void log_print(std::string component, log_level level, std::string msg, ...)
 {
     if(!(level & log_filter)) return;
 
     std::string level_str;
     switch(level)
     {
-    case log_level::error:
+    case error:
     {
         level_str = "Error";
         break;
     }
-    case log_level::warning:
+    case warning:
     {
         level_str = "Warning";
         break;
     }
-    case log_level::debug:
+    case debug:
     {
         level_str = "Debug";
         break;
     }
-    case log_level::verbose:
+    case verbose:
     {
         level_str = "Verbose";
         break;
     }
-    case log_level::info:
+    case info:
     {
         level_str = "Info";
         break;
