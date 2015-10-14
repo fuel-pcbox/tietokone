@@ -1,6 +1,18 @@
 #include "cpu.h"
 #include "mem.h"
 
+struct cpu_op_template
+{
+    u8 opcode;
+    std::function<void(cpu*)> func;
+};
+
+static cpu_op_template optbl_16d_16a[] =
+{
+    {0x31, xor_w_rmw_a16},
+    {0xea, jmp_far_a16},
+};
+
 void cpu::init()
 {
     cs = 0xf0000;
@@ -33,6 +45,16 @@ void cpu::init()
     modseg[5] = &ds;
     modseg[6] = &ss;
     modseg[7] = &ds;
+
+    for(int i = 0;i<256;i++)
+    {
+        op_table_16d_16a[i] = unknown;
+    }
+
+    for(auto& tbl_op : optbl_16d_16a)
+    {
+        op_table_16d_16a[tbl_op.opcode] = tbl_op.func;
+    }
 }
 
 void cpu::loadseg(u16 seg, x86seg* s)
@@ -125,44 +147,42 @@ void cpu::setznp16(u16 val)
     else flags &= 0xfffffffb;
 }
 
+void unknown(cpu* maincpu)
+{
+    log_print("CPU", verbose, "Unknown Opcode %02x CS:%08x IP:%08x", maincpu->opcode, maincpu->cs, maincpu->ip);
+}
+
+void xor_w_rmw_a16(cpu* maincpu)
+{
+    u8 modrm = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    maincpu->fetch_ea_16(modrm);
+    if(maincpu->mod == 3)
+    {
+        u16 src = maincpu->regs[maincpu->rm].w;
+        u16 dst = maincpu->regs[maincpu->reg].w;
+        maincpu->setznp16(src ^ dst);
+        maincpu->regs[maincpu->rm].w = src ^ dst;
+    }
+    else
+    {
+        u16 src = cpu_readword(maincpu->ea_seg_base + maincpu->ea_addr);
+        u16 dst = maincpu->regs[maincpu->reg].w;
+        cpu_writeword(maincpu->ea_seg_base + maincpu->ea_addr, src ^ dst);
+        maincpu->setznp16(src ^ dst);
+    }
+    maincpu->ip+=2;
+}
+void jmp_far_a16(cpu* maincpu)
+{
+    u16 off = cpu_readword(maincpu->cs +maincpu-> ip + 1);
+    u16 seg = cpu_readword(maincpu->cs + maincpu->ip + 3);
+    maincpu->ip = off;
+    maincpu->loadcs(seg);
+}
+
 void cpu::tick()
 {
-    u8 opcode = cpu_readbyte(cs + ip);
+    opcode = cpu_readbyte(cs + ip);
     log_print("CPU", verbose, "Opcode %02x CS:%08x IP:%08x", opcode, cs, ip);
-    switch(opcode)
-    {
-        case 0x31:
-        {
-            u8 modrm = cpu_readbyte(cs + ip + 1);
-            fetch_ea_16(modrm);
-            if(mod == 3)
-            {
-                u16 src = regs[rm].w;
-                u16 dst = regs[reg].w;
-                setznp16(src ^ dst);
-                regs[rm].w = src ^ dst;
-            }
-            else
-            {
-                u16 src = cpu_readword(ea_seg_base + ea_addr);
-                u16 dst = regs[reg].w;
-                cpu_writeword(ea_seg_base + ea_addr, src ^ dst);
-                setznp16(src ^ dst);
-            }
-            ip+=2;
-            break;
-        }
-        case 0xea:
-        {
-            u16 off = cpu_readword(cs + ip + 1);
-            u16 seg = cpu_readword(cs + ip + 3);
-            ip = off;
-            loadcs(seg);
-            break;
-        }
-        default:
-        {
-            log_print("CPU", verbose, "Unknown Opcode %02x CS:%08x IP:%08x", cpu_readbyte(cs + ip), cs, ip);
-        }
-    }
+    op_table_16d_16a[opcode](this);
 }

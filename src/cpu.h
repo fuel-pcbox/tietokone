@@ -56,6 +56,8 @@ struct cpu
     u16* modadd[2][8];
     u32* modseg[8];
 
+    u8 opcode;
+
     int mod;
     int reg;
     int rm;
@@ -66,5 +68,12 @@ struct cpu
     void fetch_ea_16(u8 modrm);
     void setznp16(u16 val);
 
+    std::function<void(cpu*)> op_table_16d_16a[256];
+
     void tick();
 };
+
+void unknown(cpu* maincpu);
+
+void xor_w_rmw_a16(cpu* maincpu);
+void jmp_far_a16(cpu* maincpu);
