@@ -4,6 +4,10 @@
 #include <cstdio>
 #include <vector>
 #include <functional>
+#include <string>
+#include <cstdlib>
+#include <iostream>
+#include <climits>
 #include "log.h"
 
 typedef uint8_t u8;
