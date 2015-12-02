@@ -10,6 +10,7 @@ struct cpu_op_template
 static cpu_op_template optbl_16d_16a[] =
 {
     {0x31, xor_w_rmw_a16},
+    {0xe6, out_al_imm},
     {0xea, jmp_far_a16},
 };
 
@@ -172,6 +173,14 @@ void xor_w_rmw_a16(cpu* maincpu)
     }
     maincpu->ip+=2;
 }
+
+void out_al_imm(cpu* maincpu)
+{
+  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+  cpu_iowritebyte(maincpu->AX.b[0], tmp);
+  maincpu->ip+=2;
+}
+
 void jmp_far_a16(cpu* maincpu)
 {
     u16 off = cpu_readword(maincpu->cs +maincpu-> ip + 1);

@@ -76,4 +76,5 @@ struct cpu
 void unknown(cpu* maincpu);
 
 void xor_w_rmw_a16(cpu* maincpu);
+void out_al_imm(cpu* maincpu);
 void jmp_far_a16(cpu* maincpu);

@@ -16,7 +16,7 @@ int main(int ac, char** av)
 
     log_filter = error | warning | debug | verbose | info;
 
-    handlers.push_back(bioshandler);
+    mem_init();
 
     cpu maincpu;
 
