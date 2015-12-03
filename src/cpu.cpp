@@ -10,7 +10,21 @@ struct cpu_op_template
 static cpu_op_template optbl_16d_16a[] =
 {
     {0x31, xor_w_rmw_a16},
+    {0x3c, cmp_al_imm},
+    {0x74, jump_if_z},
+    {0x88, mov_b_r_a16},
+    {0xb0, mov_al_imm},
+    {0xb1, mov_cl_imm},
+    {0xb2, mov_dl_imm},
+    {0xb3, mov_bl_imm},
+    {0xb4, mov_ah_imm},
+    {0xb5, mov_ch_imm},
+    {0xb6, mov_dh_imm},
+    {0xb7, mov_bh_imm},
+    {0xe4, in_al_imm},
+    {0xe5, in_ax_imm},
     {0xe6, out_al_imm},
+    {0xe7, out_ax_imm},
     {0xea, jmp_far_a16},
 };
 
@@ -131,6 +145,23 @@ void cpu::fetch_ea_16(u8 modrm)
     }
 }
 
+void cpu::setznp8(u8 val)
+{
+    if(!val) flags |= 0x40; //Zero flag.
+    else flags &= 0xffffffbf;
+
+    if(val & 0x80) flags |= 0x80; //Sign flag.
+    else flags &= 0xffffff7f;
+
+    int v = 0;
+    for(int i = 0;i < 8; i++)
+    {
+        if(val & (1 << i)) v ^= 1;
+    }
+    if(!v) flags |= 0x04;
+    else flags &= 0xfffffffb;
+}
+
 void cpu::setznp16(u16 val)
 {
     if(!val) flags |= 0x40; //Zero flag.
@@ -174,16 +205,126 @@ void xor_w_rmw_a16(cpu* maincpu)
     maincpu->ip+=2;
 }
 
+void cmp_al_imm(cpu* maincpu)
+{
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    maincpu->setznp8(maincpu->AX.b[0] - tmp);
+    maincpu->ip+=2;
+}
+
+void jump_if_z(cpu* maincpu)
+{
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    if(maincpu->flags & 0x40) maincpu->ip += (s8)tmp;
+    maincpu->ip+=2;
+}
+
+void mov_b_r_a16(cpu* maincpu)
+{
+    u8 modrm = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    maincpu->fetch_ea_16(modrm);
+    if(maincpu->mod == 3)
+    {
+        u16 src = maincpu->regs[maincpu->rm].b[0];
+        u16 dst = maincpu->regs[maincpu->reg].b[0];
+        maincpu->regs[maincpu->rm].b[0] = dst;
+    }
+    else
+    {
+        u16 src = cpu_readbyte(maincpu->ea_seg_base + maincpu->ea_addr);
+        u16 dst = maincpu->regs[maincpu->reg].b[0];
+        cpu_writebyte(maincpu->ea_seg_base + maincpu->ea_addr, src ^ dst);
+    }
+    maincpu->ip+=2;
+}
+
+void mov_al_imm(cpu* maincpu)
+{
+  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+  maincpu->AX.b[0] = tmp;
+  maincpu->ip+=2;
+}
+
+void mov_cl_imm(cpu* maincpu)
+{
+  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+  maincpu->CX.b[0] = tmp;
+  maincpu->ip+=2;
+}
+
+void mov_dl_imm(cpu* maincpu)
+{
+  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+  maincpu->DX.b[0] = tmp;
+  maincpu->ip+=2;
+}
+
+void mov_bl_imm(cpu* maincpu)
+{
+  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+  maincpu->BX.b[0] = tmp;
+  maincpu->ip+=2;
+}
+
+void mov_ah_imm(cpu* maincpu)
+{
+  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+  maincpu->AX.b[1] = tmp;
+  maincpu->ip+=2;
+}
+
+void mov_ch_imm(cpu* maincpu)
+{
+  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+  maincpu->CX.b[1] = tmp;
+  maincpu->ip+=2;
+}
+
+void mov_dh_imm(cpu* maincpu)
+{
+  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+  maincpu->DX.b[1] = tmp;
+  maincpu->ip+=2;
+}
+
+void mov_bh_imm(cpu* maincpu)
+{
+  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+  maincpu->BX.b[1] = tmp;
+  maincpu->ip+=2;
+}
+
+void in_al_imm(cpu* maincpu)
+{
+  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+  maincpu->AX.b[0] = cpu_ioreadbyte(tmp);
+  maincpu->ip+=2;
+}
+
+void in_ax_imm(cpu* maincpu)
+{
+  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+  maincpu->AX.w = cpu_ioreadword(tmp);
+  maincpu->ip+=2;
+}
+
 void out_al_imm(cpu* maincpu)
 {
   u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
-  cpu_iowritebyte(maincpu->AX.b[0], tmp);
+  cpu_iowritebyte(tmp, maincpu->AX.b[0]);
+  maincpu->ip+=2;
+}
+
+void out_ax_imm(cpu* maincpu)
+{
+  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+  cpu_iowritebyte(tmp, maincpu->AX.w);
   maincpu->ip+=2;
 }
 
 void jmp_far_a16(cpu* maincpu)
 {
-    u16 off = cpu_readword(maincpu->cs +maincpu-> ip + 1);
+    u16 off = cpu_readword(maincpu->cs + maincpu->ip + 1);
     u16 seg = cpu_readword(maincpu->cs + maincpu->ip + 3);
     maincpu->ip = off;
     maincpu->loadcs(seg);

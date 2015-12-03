@@ -66,6 +66,7 @@ struct cpu
     u32 ea_addr;
 
     void fetch_ea_16(u8 modrm);
+    void setznp8(u8 val);
     void setznp16(u16 val);
 
     std::function<void(cpu*)> op_table_16d_16a[256];
@@ -76,5 +77,19 @@ struct cpu
 void unknown(cpu* maincpu);
 
 void xor_w_rmw_a16(cpu* maincpu);
+void cmp_al_imm(cpu* maincpu);
+void jump_if_z(cpu* maincpu);
+void mov_b_r_a16(cpu* maincpu);
+void mov_al_imm(cpu* maincpu);
+void mov_cl_imm(cpu* maincpu);
+void mov_dl_imm(cpu* maincpu);
+void mov_bl_imm(cpu* maincpu);
+void mov_ah_imm(cpu* maincpu);
+void mov_ch_imm(cpu* maincpu);
+void mov_dh_imm(cpu* maincpu);
+void mov_bh_imm(cpu* maincpu);
+void in_al_imm(cpu* maincpu);
+void in_ax_imm(cpu* maincpu);
 void out_al_imm(cpu* maincpu);
+void out_ax_imm(cpu* maincpu);
 void jmp_far_a16(cpu* maincpu);
