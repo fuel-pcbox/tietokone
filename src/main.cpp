@@ -10,18 +10,22 @@ char *input(const char *prompt);
 
 int main(int ac, char** av)
 {
-    FILE* biosfp = fopen("roms/bios.bin","rb");
+    FILE* biosfp = fopen(av[1],"rb");
 
-    fread(bios,0x20000,1,biosfp);
+    fseek(biosfp,0,SEEK_END);
+    long biossize = ftell(biosfp);
+    fseek(biosfp,0,SEEK_SET);
+    
+    fread(bios+0x10000,biossize,1,biosfp);
 
     fclose(biosfp);
 
     log_filter = error | warning | debug | verbose | info;
 
     mem_init();
+    keyboard_init();
 
     cpu maincpu;
-
 
     printf("Tietokone 386 PC Emulator by the Tietokone Team\n");
     Command::loadCLI();

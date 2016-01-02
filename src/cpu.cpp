@@ -12,9 +12,14 @@ static cpu_op_template optbl_16d_16a[] =
     {0x31, xor_w_rmw_a16},
     {0x3c, cmp_al_imm},
     {0x74, jump_if_z},
+    {0x75, jump_if_nz},
     {0x88, mov_b_r_a16},
     {0x89, mov_w_r_a16},
-    {0x8e, mov_seg_r_a16},
+    {0x8b, mov_r_w_a16},
+    {0x8c, mov_w_seg_a16},
+    {0x8e, mov_seg_w_a16},
+    {0x90, nop},
+    {0xa8, test_al_imm},
     {0xb0, mov_al_imm},
     {0xb1, mov_cl_imm},
     {0xb2, mov_dl_imm},
@@ -35,8 +40,11 @@ static cpu_op_template optbl_16d_16a[] =
     {0xe5, in_ax_imm},
     {0xe6, out_al_imm},
     {0xe7, out_ax_imm},
+    {0xe9, jmp_r16},
     {0xea, jmp_far_a16},
+    {0xeb, jmp_r8},
     {0xfa, cli},
+    {0xfc, cld},
 };
 
 void cpu::init()
@@ -235,6 +243,13 @@ void jump_if_z(cpu* maincpu)
     maincpu->ip+=2;
 }
 
+void jump_if_nz(cpu* maincpu)
+{
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    if(!(maincpu->flags & 0x40)) maincpu->ip += (s8)tmp;
+    maincpu->ip+=2;
+}
+
 void mov_b_r_a16(cpu* maincpu)
 {
     u8 modrm = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
@@ -271,7 +286,25 @@ void mov_w_r_a16(cpu* maincpu)
     maincpu->ip+=2;
 }
 
-void mov_seg_r_a16(cpu* maincpu)
+void mov_r_w_a16(cpu* maincpu)
+{
+    u8 modrm = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    maincpu->fetch_ea_16(modrm);
+    if(maincpu->mod == 3)
+    {
+        u16 dst = maincpu->regs[maincpu->rm].w;
+        u16 src = maincpu->regs[maincpu->reg].w;
+        maincpu->regs[maincpu->rm].w = dst;
+    }
+    else
+    {
+        u16 src = maincpu->regs[maincpu->reg].w;
+        cpu_writeword(maincpu->ea_seg_base + maincpu->ea_addr, src);
+    }
+    maincpu->ip+=2;
+}
+
+void mov_w_seg_a16(cpu* maincpu)
 {
     u8 modrm = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
     maincpu->fetch_ea_16(modrm);
@@ -286,6 +319,35 @@ void mov_seg_r_a16(cpu* maincpu)
         u16 dst = maincpu->segs[maincpu->reg].seg;
         cpu_writeword(maincpu->ea_seg_base + maincpu->ea_addr, dst);
     }
+    maincpu->ip+=2;
+}
+
+void mov_seg_w_a16(cpu* maincpu)
+{
+    u8 modrm = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    maincpu->fetch_ea_16(modrm);
+    if(maincpu->mod == 3)
+    {
+        u16 src = maincpu->regs[maincpu->rm].w;
+        u16 dst = maincpu->segs[maincpu->reg].seg;
+        maincpu->segs[maincpu->reg].seg = src;
+    }
+    else
+    {
+        maincpu->segs[maincpu->reg].seg = cpu_readword(maincpu->ea_seg_base + maincpu->ea_addr);
+    }
+    maincpu->ip+=2;
+}
+
+void nop(cpu* maincpu)
+{
+    maincpu->ip++;
+}
+
+void test_al_imm(cpu* maincpu)
+{
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    maincpu->setznp8(maincpu->AX.b[0] & tmp);
     maincpu->ip+=2;
 }
 
@@ -429,6 +491,13 @@ void out_ax_imm(cpu* maincpu)
     maincpu->ip+=2;
 }
 
+void jmp_r16(cpu* maincpu)
+{
+    u16 off = cpu_readword(maincpu->cs + maincpu->ip + 1);
+    maincpu->ip += 3;
+    maincpu->ip += (s16)off;
+}
+
 void jmp_far_a16(cpu* maincpu)
 {
     u16 off = cpu_readword(maincpu->cs + maincpu->ip + 1);
@@ -437,9 +506,22 @@ void jmp_far_a16(cpu* maincpu)
     maincpu->loadcs(seg);
 }
 
+void jmp_r8(cpu* maincpu)
+{
+    u8 off = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    maincpu->ip += 2;
+    maincpu->ip += (s8)off;
+}
+
 void cli(cpu* maincpu)
 {
     maincpu->flags &= 0xfffffdff;
+    maincpu->ip+=1;
+}
+
+void cld(cpu* maincpu)
+{
+    maincpu->flags &= 0xfffffbff;
     maincpu->ip+=1;
 }
 
