@@ -11,33 +11,33 @@ memhandler ramhandler =
 {
     0x00000, 0x9ffff,
 
-    [](u32 addr) -> u8
+    [](u64 addr) -> u8
     {
         return ram[addr];
     },
 
-    [](u32 addr) -> u16
+    [](u64 addr) -> u16
     {
         return (ram[addr+1] << 8) | ram[addr];
     },
 
-    [](u32 addr) -> u32
+    [](u64 addr) -> u32
     {
         return (ram[addr+3] << 24) | (ram[addr+2] << 16) | (ram[addr+1] << 8) | ram[addr];
     },
 
-    [](u32 addr, u8 data)
+    [](u64 addr, u8 data)
     {
         ram[addr] = data;
     },
 
-    [](u32 addr, u16 data)
+    [](u64 addr, u16 data)
     {
         ram[addr] = data & 0xff;
         ram[addr + 1] = (data >> 8) & 0xff;
     },
 
-    [](u32 addr, u32 data)
+    [](u64 addr, u32 data)
     {
         ram[addr] = data & 0xff;
         ram[addr + 1] = (data >> 8) & 0xff;
@@ -50,24 +50,24 @@ memhandler bioshandler =
 {
     0xe0000, 0xfffff,
 
-    [](u32 addr) -> u8
+    [](u64 addr) -> u8
     {
         return bios[addr];
     },
 
-    [](u32 addr) -> u16
+    [](u64 addr) -> u16
     {
         return (bios[addr+1] << 8) | bios[addr];
     },
 
-    [](u32 addr) -> u32
+    [](u64 addr) -> u32
     {
         return (bios[addr+3] << 24) | (bios[addr+2] << 16) | (bios[addr+1] << 8) | bios[addr];
     },
     nullptr, nullptr, nullptr
 };
 
-u8 cpu_readbyte(u32 addr)
+u8 cpu_readbyte(u64 addr)
 {
     for(int i = 0; i < memhandlers.size(); i++)
     {
@@ -75,7 +75,7 @@ u8 cpu_readbyte(u32 addr)
     }
 }
 
-u16 cpu_readword(u32 addr)
+u16 cpu_readword(u64 addr)
 {
     for(int i = 0; i < memhandlers.size(); i++)
     {
@@ -83,7 +83,7 @@ u16 cpu_readword(u32 addr)
     }
 }
 
-u32 cpu_readlong(u32 addr)
+u32 cpu_readlong(u64 addr)
 {
     for(int i = 0; i < memhandlers.size(); i++)
     {
@@ -91,7 +91,7 @@ u32 cpu_readlong(u32 addr)
     }
 }
 
-void cpu_writebyte(u32 addr, u8 data)
+void cpu_writebyte(u64 addr, u8 data)
 {
     for(int i = 0; i < memhandlers.size(); i++)
     {
@@ -103,7 +103,7 @@ void cpu_writebyte(u32 addr, u8 data)
     }
 }
 
-void cpu_writeword(u32 addr, u16 data)
+void cpu_writeword(u64 addr, u16 data)
 {
     for(int i = 0; i < memhandlers.size(); i++)
     {
@@ -115,7 +115,7 @@ void cpu_writeword(u32 addr, u16 data)
     }
 }
 
-void cpu_writelong(u32 addr, u32 data)
+void cpu_writelong(u64 addr, u32 data)
 {
     for(int i = 0; i < memhandlers.size(); i++)
     {
@@ -128,7 +128,7 @@ void cpu_writelong(u32 addr, u32 data)
 }
 
 
-u8 cpu_ioreadbyte(u32 addr)
+u8 cpu_ioreadbyte(u64 addr)
 {
   for(int i = 0; i < iohandlers.size(); i++)
   {
@@ -136,7 +136,7 @@ u8 cpu_ioreadbyte(u32 addr)
   }
 }
 
-u16 cpu_ioreadword(u32 addr)
+u16 cpu_ioreadword(u64 addr)
 {
   for(int i = 0; i < iohandlers.size(); i++)
   {
@@ -144,7 +144,7 @@ u16 cpu_ioreadword(u32 addr)
   }
 }
 
-u32 cpu_ioreadlong(u32 addr)
+u32 cpu_ioreadlong(u64 addr)
 {
   for(int i = 0; i < iohandlers.size(); i++)
   {
@@ -152,7 +152,7 @@ u32 cpu_ioreadlong(u32 addr)
   }
 }
 
-void cpu_iowritebyte(u32 addr, u8 data)
+void cpu_iowritebyte(u64 addr, u8 data)
 {
   for(int i = 0; i < iohandlers.size(); i++)
   {
@@ -164,7 +164,7 @@ void cpu_iowritebyte(u32 addr, u8 data)
   }
 }
 
-void cpu_iowriteword(u32 addr, u16 data)
+void cpu_iowriteword(u64 addr, u16 data)
 {
   for(int i = 0; i < iohandlers.size(); i++)
   {
@@ -176,7 +176,7 @@ void cpu_iowriteword(u32 addr, u16 data)
   }
 }
 
-void cpu_iowritelong(u32 addr, u32 data)
+void cpu_iowritelong(u64 addr, u32 data)
 {
   for(int i = 0; i < iohandlers.size(); i++)
   {

@@ -3,6 +3,8 @@
 #include "cpu.h"
 #include "commands.h"
 
+std::vector<u64> breakpoints;
+
 std::vector<std::string> splitStrn(const char *str, const char *delim);
 char *input(const char *prompt);
 
@@ -34,6 +36,10 @@ int main(int ac, char** av)
 	{
 		for(int i = 0;i<50;i++)
 		{
+            for(auto bp : breakpoints)
+            {
+                if((maincpu.cs + maincpu.ip) == bp) return;
+            }
 			maincpu.tick();
 		}
 	});
@@ -43,6 +49,16 @@ int main(int ac, char** av)
 		maincpu.tick();
 	});
 
+    new Command("printregs", "Print the emulated processor's registers", [&] (std::vector<std::string> args)
+	{
+		printf("EAX=%08x EBX=%08x ECX=%08x EDX=%08x\n",maincpu.AX.l,maincpu.BX.l,maincpu.CX.l,maincpu.DX.l);
+        printf("ESP=%08x EBP=%08x ESI=%08x EDI=%08x\n",maincpu.SP.l,maincpu.BP.l,maincpu.SI.l,maincpu.DI.l);
+	});
+    
+    new Command("b", "Sets a breakpoint for the emulated processor", [&] (std::vector<std::string> args)
+	{
+		breakpoints.push_back(strtoull(args[0].c_str(),nullptr,16));
+	});
 
 	char *prompt;
 	printf("Use \"hlp\" to see the list of available commands.\n");

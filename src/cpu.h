@@ -11,18 +11,18 @@
 #define SI regs[6]
 #define DI regs[7]
 
-#define CS _cs.seg
-#define DS _ds.seg
-#define ES _es.seg
-#define SS _ss.seg
-#define FS _fs.seg
-#define GS _gs.seg
-#define cs _cs.base
-#define ds _ds.base
-#define es _es.base
-#define ss _ss.base
-#define seg_fs _fs.base
-#define gs _gs.base
+#define CS segs[1].seg
+#define DS segs[3].seg
+#define ES segs[0].seg
+#define SS segs[2].seg
+#define FS segs[4].seg
+#define GS segs[5].seg
+#define cs segs[1].base
+#define ds segs[3].base
+#define es segs[0].base
+#define ss segs[2].base
+#define seg_fs segs[4].base
+#define gs segs[5].base
 
 struct cpu
 {
@@ -43,7 +43,7 @@ struct cpu
         u8 access;
         u16 seg;
         u32 limit_low, limit_high;
-    } gdt, ldt, idt, tr, _cs, _ds, _es, _ss, _fs, _gs;
+    } gdt, ldt, idt, tr, segs[6];
 
     void init();
 
@@ -80,6 +80,8 @@ void xor_w_rmw_a16(cpu* maincpu);
 void cmp_al_imm(cpu* maincpu);
 void jump_if_z(cpu* maincpu);
 void mov_b_r_a16(cpu* maincpu);
+void mov_w_r_a16(cpu* maincpu);
+void mov_seg_r_a16(cpu* maincpu);
 void mov_al_imm(cpu* maincpu);
 void mov_cl_imm(cpu* maincpu);
 void mov_dl_imm(cpu* maincpu);
@@ -88,8 +90,17 @@ void mov_ah_imm(cpu* maincpu);
 void mov_ch_imm(cpu* maincpu);
 void mov_dh_imm(cpu* maincpu);
 void mov_bh_imm(cpu* maincpu);
+void mov_ax_imm(cpu* maincpu);
+void mov_cx_imm(cpu* maincpu);
+void mov_dx_imm(cpu* maincpu);
+void mov_bx_imm(cpu* maincpu);
+void mov_sp_imm(cpu* maincpu);
+void mov_bp_imm(cpu* maincpu);
+void mov_si_imm(cpu* maincpu);
+void mov_di_imm(cpu* maincpu);
 void in_al_imm(cpu* maincpu);
 void in_ax_imm(cpu* maincpu);
 void out_al_imm(cpu* maincpu);
 void out_ax_imm(cpu* maincpu);
 void jmp_far_a16(cpu* maincpu);
+void cli(cpu* maincpu);
