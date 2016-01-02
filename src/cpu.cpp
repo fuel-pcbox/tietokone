@@ -14,7 +14,7 @@ static cpu_op_template optbl_16d_16a[] =
     {0x74, jump_if_z},
     {0x88, mov_b_r_a16},
     {0x89, mov_w_r_a16},
-    {0x8e, mov_w_r_a16},
+    {0x8e, mov_seg_r_a16},
     {0xb0, mov_al_imm},
     {0xb1, mov_cl_imm},
     {0xb2, mov_dl_imm},
