@@ -130,62 +130,62 @@ void cpu_writelong(u64 addr, u32 data)
 
 u8 cpu_ioreadbyte(u64 addr)
 {
-  for(int i = 0; i < iohandlers.size(); i++)
-  {
-    if(addr>iohandlers[i].start && addr<iohandlers[i].end) return iohandlers[i].rb(addr-iohandlers[i].start);
-  }
+    for(int i = 0; i < iohandlers.size(); i++)
+    {
+        if(addr>iohandlers[i].start && addr<iohandlers[i].end) return iohandlers[i].rb(addr-iohandlers[i].start);
+    }
 }
 
 u16 cpu_ioreadword(u64 addr)
 {
-  for(int i = 0; i < iohandlers.size(); i++)
-  {
-    if(addr>iohandlers[i].start && (addr+1)<iohandlers[i].end) return iohandlers[i].rw(addr-iohandlers[i].start);
-  }
+    for(int i = 0; i < iohandlers.size(); i++)
+    {
+        if(addr>iohandlers[i].start && (addr+1)<iohandlers[i].end) return iohandlers[i].rw(addr-iohandlers[i].start);
+    }
 }
 
 u32 cpu_ioreadlong(u64 addr)
 {
-  for(int i = 0; i < iohandlers.size(); i++)
-  {
-    if(addr>iohandlers[i].start && (addr+3)<iohandlers[i].end) return iohandlers[i].rl(addr-iohandlers[i].start);
-  }
+    for(int i = 0; i < iohandlers.size(); i++)
+    {
+        if(addr>iohandlers[i].start && (addr+3)<iohandlers[i].end) return iohandlers[i].rl(addr-iohandlers[i].start);
+    }
 }
 
 void cpu_iowritebyte(u64 addr, u8 data)
 {
-  for(int i = 0; i < iohandlers.size(); i++)
-  {
-    if(addr>iohandlers[i].start && addr<iohandlers[i].end)
+    for(int i = 0; i < iohandlers.size(); i++)
     {
-      iohandlers[i].wb(addr-iohandlers[i].start, data);
-      return;
+        if(addr>iohandlers[i].start && addr<iohandlers[i].end)
+        {
+            iohandlers[i].wb(addr-iohandlers[i].start, data);
+            return;
+        }
     }
-  }
 }
 
 void cpu_iowriteword(u64 addr, u16 data)
 {
-  for(int i = 0; i < iohandlers.size(); i++)
-  {
-    if(addr>iohandlers[i].start && (addr+1)<iohandlers[i].end)
+    for(int i = 0; i < iohandlers.size(); i++)
     {
-      iohandlers[i].ww(addr-iohandlers[i].start, data);
-      return;
+        if(addr>iohandlers[i].start && (addr+1)<iohandlers[i].end)
+        {
+            iohandlers[i].ww(addr-iohandlers[i].start, data);
+            return;
+        }
     }
-  }
 }
 
 void cpu_iowritelong(u64 addr, u32 data)
 {
-  for(int i = 0; i < iohandlers.size(); i++)
-  {
-    if(addr>iohandlers[i].start && (addr+3)<iohandlers[i].end)
+    for(int i = 0; i < iohandlers.size(); i++)
     {
-      iohandlers[i].wl(addr-iohandlers[i].start, data);
-      return;
+        if(addr>iohandlers[i].start && (addr+3)<iohandlers[i].end)
+        {
+            iohandlers[i].wl(addr-iohandlers[i].start, data);
+            return;
+        }
     }
-  }
 }
 
 void mem_init()

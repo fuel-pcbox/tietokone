@@ -28,9 +28,9 @@ struct cpu
 {
     union x86reg
     {
-         u32 l;
-         u16 w;
-         u8 b[2];
+        u32 l;
+        u16 w;
+        u8 b[2];
     } regs[8];
 
     u32 flags;

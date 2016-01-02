@@ -23,77 +23,77 @@ int main(int ac, char** av)
     cpu maincpu;
 
 
-	printf("Tietokone 386 PC Emulator by the Tietokone Team\n");
-	Command::loadCLI();
+    printf("Tietokone 386 PC Emulator by the Tietokone Team\n");
+    Command::loadCLI();
 
-	new Command("start", "Start the emulated processor", [&] (std::vector<std::string> args)
-	{
-		maincpu.init();
-	});
+    new Command("start", "Start the emulated processor", [&] (std::vector<std::string> args)
+    {
+        maincpu.init();
+    });
 
 
-	new Command("run", "Run the emulated processor", [&] (std::vector<std::string> args)
-	{
-		for(int i = 0;i<50;i++)
-		{
+    new Command("run", "Run the emulated processor", [&] (std::vector<std::string> args)
+    {
+        for(int i = 0; i<50; i++)
+        {
             for(auto bp : breakpoints)
             {
                 if((maincpu.cs + maincpu.ip) == bp) return;
             }
-			maincpu.tick();
-		}
-	});
+            maincpu.tick();
+        }
+    });
 
-	new Command("step", "Single-step the emulated processor", [&] (std::vector<std::string> args)
-	{
-		maincpu.tick();
-	});
+    new Command("step", "Single-step the emulated processor", [&] (std::vector<std::string> args)
+    {
+        maincpu.tick();
+    });
 
     new Command("printregs", "Print the emulated processor's registers", [&] (std::vector<std::string> args)
-	{
-		printf("EAX=%08x EBX=%08x ECX=%08x EDX=%08x\n",maincpu.AX.l,maincpu.BX.l,maincpu.CX.l,maincpu.DX.l);
+    {
+        printf("EAX=%08x EBX=%08x ECX=%08x EDX=%08x\n",maincpu.AX.l,maincpu.BX.l,maincpu.CX.l,maincpu.DX.l);
         printf("ESP=%08x EBP=%08x ESI=%08x EDI=%08x\n",maincpu.SP.l,maincpu.BP.l,maincpu.SI.l,maincpu.DI.l);
         printf("CS=%04x DS=%04x ES=%04x SS=%04x FS=%04x GS=%04x\n",maincpu.CS,maincpu.DS,maincpu.ES,maincpu.SS,maincpu.FS,maincpu.GS);
-	});
-    
-    new Command("b", "Sets a breakpoint for the emulated processor", [&] (std::vector<std::string> args)
-	{
-		breakpoints.push_back(strtoull(args[0].c_str(),nullptr,16));
-	});
+    });
 
-	char *prompt;
-	printf("Use \"hlp\" to see the list of available commands.\n");
-	do
-	{
-		prompt = input("> ");
-		std::vector<std::string> data = splitStrn(prompt, " ");
-		if(data.size() > 0) {               // ensure we don't cause an index out of bounds exception.
+    new Command("b", "Sets a breakpoint for the emulated processor", [&] (std::vector<std::string> args)
+    {
+        breakpoints.push_back(strtoull(args[0].c_str(),nullptr,16));
+    });
+
+    char *prompt;
+    printf("Use \"hlp\" to see the list of available commands.\n");
+    do
+    {
+        prompt = input("> ");
+        std::vector<std::string> data = splitStrn(prompt, " ");
+        if(data.size() > 0) {               // ensure we don't cause an index out of bounds exception.
             for(int i = 0; i < (signed) Command::myCommands.size(); i++)
-			{
+            {
                 if(Command::myCommands.at(i).isThis(data.at(0)))
-				{
+                {
                     std::vector<std::string> sub(data.begin() + 1, data.end());
                     Command::myCommands.at(i).doCommand(sub);
                 }
             }
         }
-	}
-	while(true);
+    }
+    while(true);
 }
 
 char *input(const char *prompt)
 {
-	int size = 256;											// we will allocate 256 chars for this purpose.
-	char * data = (char *) malloc(size * sizeof(char));		// size * 1 byte. (platform dependent). May need to be replaced with wchar later.
-	printf("%s", prompt);									// display the prompt...
-	std::cin.getline(data, size);							// read in to data.
-	if(std::cin.fail() || std::cin.bad())
-	{
-		printf("input stream error; resetting.\n");
-		std::cin.clear();										// clear the stream error flags
-		std::cin.ignore(INT_MAX, '\n');							// remove any newlines in the stream.
-	}
-	return data;
+    int size = 256;											// we will allocate 256 chars for this purpose.
+    char * data = (char *) malloc(size * sizeof(char));		// size * 1 byte. (platform dependent). May need to be replaced with wchar later.
+    printf("%s", prompt);									// display the prompt...
+    std::cin.getline(data, size);							// read in to data.
+    if(std::cin.fail() || std::cin.bad())
+    {
+        printf("input stream error; resetting.\n");
+        std::cin.clear();										// clear the stream error flags
+        std::cin.ignore(INT_MAX, '\n');							// remove any newlines in the stream.
+    }
+    return data;
 }
 
 /**
@@ -110,7 +110,7 @@ std::vector<std::string> splitStrn(const char *str, const char *delim)
     std::string token;
     std::vector<std::string> collection;
     while ( token != myData)
-	{
+    {
         token = myData.substr(0, myData.find_first_of(delim));
         myData = myData.substr(myData.find_first_of(delim) + 1);
         collection.push_back(token);

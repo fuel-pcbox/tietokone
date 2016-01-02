@@ -45,8 +45,8 @@ void cpu::init()
     CS = 0xf000;
     ip = 0xfff0;
     cr[0] = 0;
-    
-    for(int i = 0;i<8;i++)
+
+    for(int i = 0; i<8; i++)
     {
         regs[i].l = 0;
     }
@@ -77,7 +77,7 @@ void cpu::init()
     modseg[6] = &ss;
     modseg[7] = &ds;
 
-    for(int i = 0;i<256;i++)
+    for(int i = 0; i<256; i++)
     {
         op_table_16d_16a[i] = unknown;
     }
@@ -136,23 +136,23 @@ void cpu::fetch_ea_16(u8 modrm)
         {
             switch(mod)
             {
-                case 0:
-                {
-                    ea_addr = 0;
-                    break;
-                }
-                case 1:
-                {
-                    ea_addr = cpu_readbyte(cs + ip + 2);
-                    ip++;
-                    break;
-                }
-                case 2:
-                {
-                    ea_addr = cpu_readword(cs + ip + 2);
-                    ip+=2;
-                    break;
-                }
+            case 0:
+            {
+                ea_addr = 0;
+                break;
+            }
+            case 1:
+            {
+                ea_addr = cpu_readbyte(cs + ip + 2);
+                ip++;
+                break;
+            }
+            case 2:
+            {
+                ea_addr = cpu_readword(cs + ip + 2);
+                ip+=2;
+                break;
+            }
             }
 
             ea_addr += *modadd[0][rm] + *modadd[1][rm];
@@ -170,7 +170,7 @@ void cpu::setznp8(u8 val)
     else flags &= 0xffffff7f;
 
     int v = 0;
-    for(int i = 0;i < 8; i++)
+    for(int i = 0; i < 8; i++)
     {
         if(val & (1 << i)) v ^= 1;
     }
@@ -187,7 +187,7 @@ void cpu::setznp16(u16 val)
     else flags &= 0xffffff7f;
 
     int v = 0;
-    for(int i = 0;i < 16; i++)
+    for(int i = 0; i < 16; i++)
     {
         if(val & (1 << i)) v ^= 1;
     }
@@ -291,58 +291,58 @@ void mov_seg_r_a16(cpu* maincpu)
 
 void mov_al_imm(cpu* maincpu)
 {
-  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
-  maincpu->AX.b[0] = tmp;
-  maincpu->ip+=2;
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    maincpu->AX.b[0] = tmp;
+    maincpu->ip+=2;
 }
 
 void mov_cl_imm(cpu* maincpu)
 {
-  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
-  maincpu->CX.b[0] = tmp;
-  maincpu->ip+=2;
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    maincpu->CX.b[0] = tmp;
+    maincpu->ip+=2;
 }
 
 void mov_dl_imm(cpu* maincpu)
 {
-  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
-  maincpu->DX.b[0] = tmp;
-  maincpu->ip+=2;
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    maincpu->DX.b[0] = tmp;
+    maincpu->ip+=2;
 }
 
 void mov_bl_imm(cpu* maincpu)
 {
-  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
-  maincpu->BX.b[0] = tmp;
-  maincpu->ip+=2;
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    maincpu->BX.b[0] = tmp;
+    maincpu->ip+=2;
 }
 
 void mov_ah_imm(cpu* maincpu)
 {
-  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
-  maincpu->AX.b[1] = tmp;
-  maincpu->ip+=2;
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    maincpu->AX.b[1] = tmp;
+    maincpu->ip+=2;
 }
 
 void mov_ch_imm(cpu* maincpu)
 {
-  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
-  maincpu->CX.b[1] = tmp;
-  maincpu->ip+=2;
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    maincpu->CX.b[1] = tmp;
+    maincpu->ip+=2;
 }
 
 void mov_dh_imm(cpu* maincpu)
 {
-  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
-  maincpu->DX.b[1] = tmp;
-  maincpu->ip+=2;
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    maincpu->DX.b[1] = tmp;
+    maincpu->ip+=2;
 }
 
 void mov_bh_imm(cpu* maincpu)
 {
-  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
-  maincpu->BX.b[1] = tmp;
-  maincpu->ip+=2;
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    maincpu->BX.b[1] = tmp;
+    maincpu->ip+=2;
 }
 
 void mov_ax_imm(cpu* maincpu)
@@ -403,30 +403,30 @@ void mov_di_imm(cpu* maincpu)
 
 void in_al_imm(cpu* maincpu)
 {
-  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
-  maincpu->AX.b[0] = cpu_ioreadbyte(tmp);
-  maincpu->ip+=2;
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    maincpu->AX.b[0] = cpu_ioreadbyte(tmp);
+    maincpu->ip+=2;
 }
 
 void in_ax_imm(cpu* maincpu)
 {
-  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
-  maincpu->AX.w = cpu_ioreadword(tmp);
-  maincpu->ip+=2;
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    maincpu->AX.w = cpu_ioreadword(tmp);
+    maincpu->ip+=2;
 }
 
 void out_al_imm(cpu* maincpu)
 {
-  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
-  cpu_iowritebyte(tmp, maincpu->AX.b[0]);
-  maincpu->ip+=2;
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    cpu_iowritebyte(tmp, maincpu->AX.b[0]);
+    maincpu->ip+=2;
 }
 
 void out_ax_imm(cpu* maincpu)
 {
-  u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
-  cpu_iowritebyte(tmp, maincpu->AX.w);
-  maincpu->ip+=2;
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    cpu_iowritebyte(tmp, maincpu->AX.w);
+    maincpu->ip+=2;
 }
 
 void jmp_far_a16(cpu* maincpu)
