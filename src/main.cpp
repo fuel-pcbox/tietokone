@@ -53,6 +53,7 @@ int main(int ac, char** av)
 	{
 		printf("EAX=%08x EBX=%08x ECX=%08x EDX=%08x\n",maincpu.AX.l,maincpu.BX.l,maincpu.CX.l,maincpu.DX.l);
         printf("ESP=%08x EBP=%08x ESI=%08x EDI=%08x\n",maincpu.SP.l,maincpu.BP.l,maincpu.SI.l,maincpu.DI.l);
+        printf("CS=%04x DS=%04x ES=%04x SS=%04x FS=%04x GS=%04x\n",maincpu.CS,maincpu.DS,maincpu.ES,maincpu.SS,maincpu.FS,maincpu.GS);
 	});
     
     new Command("b", "Sets a breakpoint for the emulated processor", [&] (std::vector<std::string> args)
