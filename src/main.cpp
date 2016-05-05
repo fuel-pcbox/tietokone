@@ -71,6 +71,14 @@ int main(int ac, char** av)
         breakpoints.erase(breakpoints.begin() + strtoull(args[0].c_str(),nullptr,10) - 1);
     });
 
+    new Command("bplist", "Lists all breakpoints for the emulated processor", [&] (std::vector<std::string> args)
+    {
+        for(int i = 0;i<breakpoints.size;i++)
+        {
+          printf("Breakpoint %d at address %08x\n", i + 1, breakpoints[i]);
+        }
+    });
+
     char *prompt;
     printf("Use \"hlp\" to see the list of available commands.\n");
     do
