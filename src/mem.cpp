@@ -1,7 +1,8 @@
 #include "mem.h"
 
 bool watchpoint_hit = false;
-std::vector<watchpoint> watchpoints;
+std::vector<watchpoint> memwatchpoints;
+std::vector<watchpoint> iowatchpoints;
 
 std::vector<memhandler> memhandlers;
 std::vector<memhandler> iohandlers;
@@ -72,7 +73,7 @@ memhandler bioshandler =
 
 u8 cpu_readbyte(u64 addr)
 {
-    for(auto w : watchpoints)
+    for(auto w : memwatchpoints)
     {
         if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_R)) watchpoint_hit = true;
     }
@@ -86,7 +87,7 @@ u8 cpu_readbyte(u64 addr)
 
 u16 cpu_readword(u64 addr)
 {
-    for(auto w : watchpoints)
+    for(auto w : memwatchpoints)
     {
         if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_R)) watchpoint_hit = true;
     }
@@ -100,7 +101,7 @@ u16 cpu_readword(u64 addr)
 
 u32 cpu_readlong(u64 addr)
 {
-    for(auto w : watchpoints)
+    for(auto w : memwatchpoints)
     {
         if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_R)) watchpoint_hit = true;
     }
@@ -114,7 +115,7 @@ u32 cpu_readlong(u64 addr)
 
 void cpu_writebyte(u64 addr, u8 data)
 {
-    for(auto w : watchpoints)
+    for(auto w : memwatchpoints)
     {
         if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_W)) watchpoint_hit = true;
     }
@@ -132,7 +133,7 @@ void cpu_writebyte(u64 addr, u8 data)
 
 void cpu_writeword(u64 addr, u16 data)
 {
-    for(auto w : watchpoints)
+    for(auto w : memwatchpoints)
     {
         if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_W)) watchpoint_hit = true;
     }
@@ -150,7 +151,7 @@ void cpu_writeword(u64 addr, u16 data)
 
 void cpu_writelong(u64 addr, u32 data)
 {
-    for(auto w : watchpoints)
+    for(auto w : memwatchpoints)
     {
         if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_W)) watchpoint_hit = true;
     }
@@ -169,6 +170,11 @@ void cpu_writelong(u64 addr, u32 data)
 
 u8 cpu_ioreadbyte(u64 addr)
 {
+    for(auto w : iowatchpoints)
+    {
+        if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_R)) watchpoint_hit = true;
+    }
+    
     for(int i = 0; i < iohandlers.size(); i++)
     {
         if(addr>iohandlers[i].start && addr<=iohandlers[i].end) return iohandlers[i].rb(addr-iohandlers[i].start);
@@ -177,6 +183,11 @@ u8 cpu_ioreadbyte(u64 addr)
 
 u16 cpu_ioreadword(u64 addr)
 {
+    for(auto w : iowatchpoints)
+    {
+        if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_R)) watchpoint_hit = true;
+    }
+    
     for(int i = 0; i < iohandlers.size(); i++)
     {
         if(addr>iohandlers[i].start && (addr+1)<=iohandlers[i].end) return iohandlers[i].rw(addr-iohandlers[i].start);
@@ -185,6 +196,11 @@ u16 cpu_ioreadword(u64 addr)
 
 u32 cpu_ioreadlong(u64 addr)
 {
+    for(auto w : iowatchpoints)
+    {
+        if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_R)) watchpoint_hit = true;
+    }
+    
     for(int i = 0; i < iohandlers.size(); i++)
     {
         if(addr>iohandlers[i].start && (addr+3)<=iohandlers[i].end) return iohandlers[i].rl(addr-iohandlers[i].start);
@@ -193,6 +209,11 @@ u32 cpu_ioreadlong(u64 addr)
 
 void cpu_iowritebyte(u64 addr, u8 data)
 {
+    for(auto w : iowatchpoints)
+    {
+        if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_W)) watchpoint_hit = true;
+    }
+    
     for(int i = 0; i < iohandlers.size(); i++)
     {
         if(addr>iohandlers[i].start && addr<=iohandlers[i].end)
@@ -205,6 +226,11 @@ void cpu_iowritebyte(u64 addr, u8 data)
 
 void cpu_iowriteword(u64 addr, u16 data)
 {
+    for(auto w : iowatchpoints)
+    {
+        if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_W)) watchpoint_hit = true;
+    }
+    
     for(int i = 0; i < iohandlers.size(); i++)
     {
         if(addr>iohandlers[i].start && (addr+1)<=iohandlers[i].end)
@@ -217,6 +243,11 @@ void cpu_iowriteword(u64 addr, u16 data)
 
 void cpu_iowritelong(u64 addr, u32 data)
 {
+    for(auto w : iowatchpoints)
+    {
+        if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_W)) watchpoint_hit = true;
+    }
+    
     for(int i = 0; i < iohandlers.size(); i++)
     {
         if(addr>iohandlers[i].start && (addr+3)<=iohandlers[i].end)

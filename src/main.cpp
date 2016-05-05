@@ -108,12 +108,24 @@ int main(int ac, char** av)
     
     new Command("wp", "Sets a watchpoint for the emulated processor", [&] (std::vector<std::string> args)
     {
-        if(args.size() < 3) return;
+        if(args.size() < 4) return;
         int access = 0;
-        if(args[2] == "r") access = WATCHPOINT_R;
-        else if(args[2] == "w") access = WATCHPOINT_W; 
-        else access = WATCHPOINT_RW;  
-        watchpoints.push_back({strtoull(args[0].c_str(),nullptr,16), strtoull(args[1].c_str(),nullptr,16), access});
+        int addrspace = 0;
+        if(args[2] == "mem") addrspace = 0;
+        else if(args[2] == "io") addrspace = 1;
+        
+        if(args[3] == "r") access = WATCHPOINT_R;
+        else if(args[3] == "w") access = WATCHPOINT_W; 
+        else access = WATCHPOINT_RW;
+        
+        if(addrspace == 0)
+        {
+            memwatchpoints.push_back({strtoull(args[0].c_str(),nullptr,16), strtoull(args[1].c_str(),nullptr,16), access});
+        }
+        else if(addrspace == 1)
+        {
+            iowatchpoints.push_back({strtoull(args[0].c_str(),nullptr,16), strtoull(args[1].c_str(),nullptr,16), access});
+        }
         printf("Watchpoint %d set\n",watchpoints.size());
     });
 
