@@ -15,7 +15,7 @@ int main(int ac, char** av)
     fseek(biosfp,0,SEEK_END);
     long biossize = ftell(biosfp);
     fseek(biosfp,0,SEEK_SET);
-    
+
     fread(bios+0x10000,biossize,1,biosfp);
 
     fclose(biosfp);
@@ -60,9 +60,15 @@ int main(int ac, char** av)
         printf("CS=%04x DS=%04x ES=%04x SS=%04x FS=%04x GS=%04x\n",maincpu.CS,maincpu.DS,maincpu.ES,maincpu.SS,maincpu.FS,maincpu.GS);
     });
 
-    new Command("b", "Sets a breakpoint for the emulated processor", [&] (std::vector<std::string> args)
+    new Command("bp", "Sets a breakpoint for the emulated processor", [&] (std::vector<std::string> args)
     {
         breakpoints.push_back(strtoull(args[0].c_str(),nullptr,16));
+        printf("Breakpoint %d set\n",breakpoints.size());
+    });
+
+    new Command("bpdel", "Deletes a breakpoint for the emulated processor", [&] (std::vector<std::string> args)
+    {
+        breakpoints.erase(breakpoints.begin() + strtoull(args[0].c_str(),nullptr,10) - 1);
     });
 
     char *prompt;
@@ -106,7 +112,7 @@ char *input(const char *prompt)
  * @author ryanbwork@stackoverflow
  * @link http://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c
  *
- * Special thanks to reengine for helping debug this function.
+ * Special thanks to reenigne for helping debug this function.
  */
 std::vector<std::string> splitStrn(const char *str, const char *delim)
 {
