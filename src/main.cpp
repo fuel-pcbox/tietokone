@@ -64,12 +64,12 @@ int main(int ac, char** av)
     {
         printf("EAX=%08x EBX=%08x ECX=%08x EDX=%08x\n",maincpu.AX.l,maincpu.BX.l,maincpu.CX.l,maincpu.DX.l);
         printf("ESP=%08x EBP=%08x ESI=%08x EDI=%08x\n",maincpu.SP.l,maincpu.BP.l,maincpu.SI.l,maincpu.DI.l);
-        printf("CS=%04x CS base=%08x CS limit=%08x CS access=%02x\n", segs[1].seg, segs[1].base, segs[1].limit, segs[1].access);
-        printf("DS=%04x DS base=%08x DS limit=%08x DS access=%02x\n", segs[3].seg, segs[3].base, segs[3].limit, segs[3].access);
-        printf("ES=%04x ES base=%08x ES limit=%08x ES access=%02x\n", segs[0].seg, segs[0].base, segs[0].limit, segs[0].access);
-        printf("SS=%04x SS base=%08x SS limit=%08x SS access=%02x\n", segs[2].seg, segs[2].base, segs[2].limit, segs[2].access);
-        printf("FS=%04x FS base=%08x FS limit=%08x FS access=%02x\n", segs[4].seg, segs[4].base, segs[4].limit, segs[4].access);
-        printf("GS=%04x GS base=%08x GS limit=%08x GS access=%02x\n", segs[5].seg, segs[5].base, segs[5].limit, segs[5].access);
+        printf("CS=%04x CS base=%08x CS limit=%08x CS access=%02x\n", maincpu.segs[1].seg, maincpu.segs[1].base, maincpu.segs[1].limit, maincpu.segs[1].access);
+        printf("DS=%04x DS base=%08x DS limit=%08x DS access=%02x\n", maincpu.segs[3].seg, maincpu.segs[3].base, maincpu.segs[3].limit, maincpu.segs[3].access);
+        printf("ES=%04x ES base=%08x ES limit=%08x ES access=%02x\n", maincpu.segs[0].seg, maincpu.segs[0].base, maincpu.segs[0].limit, maincpu.segs[0].access);
+        printf("SS=%04x SS base=%08x SS limit=%08x SS access=%02x\n", maincpu.segs[2].seg, maincpu.segs[2].base, maincpu.segs[2].limit, maincpu.segs[2].access);
+        printf("FS=%04x FS base=%08x FS limit=%08x FS access=%02x\n", maincpu.segs[4].seg, maincpu.segs[4].base, maincpu.segs[4].limit, maincpu.segs[4].access);
+        printf("GS=%04x GS base=%08x GS limit=%08x GS access=%02x\n", maincpu.segs[5].seg, maincpu.segs[5].base, maincpu.segs[5].limit, maincpu.segs[5].access);
     });
 
     new Command("peekb", "Reads a byte in the emulated processor's address space", [&] (std::vector<std::string> args)
@@ -121,25 +121,35 @@ int main(int ac, char** av)
         if(addrspace == 0)
         {
             memwatchpoints.push_back({strtoull(args[0].c_str(),nullptr,16), strtoull(args[1].c_str(),nullptr,16), access});
+            printf("Memory Watchpoint %d set\n",memwatchpoints.size());
         }
         else if(addrspace == 1)
         {
             iowatchpoints.push_back({strtoull(args[0].c_str(),nullptr,16), strtoull(args[1].c_str(),nullptr,16), access});
+            printf("I/O Watchpoint %d set\n",iowatchpoints.size());
         }
-        printf("Watchpoint %d set\n",watchpoints.size());
     });
 
     new Command("wpdel", "Deletes a watchpoint for the emulated processor", [&] (std::vector<std::string> args)
     {
-        if(args.size() < 1) return;
-        watchpoints.erase(watchpoints.begin() + strtoull(args[0].c_str(),nullptr,10) - 1);
+        if(args.size() < 2) return;
+        int addrspace = 0;
+        if(args[1] == "mem") addrspace = 0;
+        else if(args[1] == "io") addrspace = 1;
+        if(addrspace == 0) memwatchpoints.erase(memwatchpoints.begin() + strtoull(args[0].c_str(),nullptr,10) - 1);
+        else if (addrspace == 1) iowatchpoints.erase(memwatchpoints.begin() + strtoull(args[0].c_str(),nullptr,10) - 1);
     });
 
     new Command("wplist", "Lists all watchpoints for the emulated processor", [&] (std::vector<std::string> args)
     {
-        for(int i = 0;i<watchpoints.size();i++)
+        for(int i = 0;i<memwatchpoints.size();i++)
         {
-          printf("Watchpoint %d from address %08x to address %08x, access %s\n", i + 1, watchpoints[i].start, watchpoints[i].end, (watchpoints[i].access == WATCHPOINT_R) ? "r" : ((watchpoints[i].access == WATCHPOINT_W) ? "w" : "rw"));
+          printf("Memory Watchpoint %d from address %08x to address %08x, access %s\n", i + 1, memwatchpoints[i].start, memwatchpoints[i].end, (memwatchpoints[i].access == WATCHPOINT_R) ? "r" : ((memwatchpoints[i].access == WATCHPOINT_W) ? "w" : "rw"));
+        }
+        
+        for(int i = 0;i<iowatchpoints.size();i++)
+        {
+          printf("I/O Watchpoint %d from address %08x to address %08x, access %s\n", i + 1, iowatchpoints[i].start, iowatchpoints[i].end, (iowatchpoints[i].access == WATCHPOINT_R) ? "r" : ((iowatchpoints[i].access == WATCHPOINT_W) ? "w" : "rw"));
         }
     });
 

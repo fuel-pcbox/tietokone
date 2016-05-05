@@ -30,6 +30,7 @@ struct watchpoint
 
 extern bool watchpoint_hit;
 extern std::vector<watchpoint> memwatchpoints;
+extern std::vector<watchpoint> iowatchpoints;
 
 extern memhandler bioshandler;
 
