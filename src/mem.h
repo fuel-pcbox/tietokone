@@ -4,7 +4,7 @@
 
 struct memhandler
 {
-    u32 start, end;
+    u64 start, end;
 
     std::function<u8(u64)> rb;
     std::function<u16(u64)> rw;
@@ -14,6 +14,22 @@ struct memhandler
     std::function<void(u64,u16)> ww;
     std::function<void(u64,u32)> wl;
 };
+
+enum
+{
+    WATCHPOINT_R = 1,
+    WATCHPOINT_W = 2,
+    WATCHPOINT_RW = 3
+};
+    
+struct watchpoint
+{
+    u64 start, end;
+    int access;
+};
+
+extern bool watchpoint_hit;
+extern std::vector<watchpoint> watchpoints;
 
 extern memhandler bioshandler;
 

@@ -47,6 +47,11 @@ int main(int ac, char** av)
                 if((maincpu.cs + maincpu.ip) == bp) return;
             }
             maincpu.tick();
+            if(watchpoint_hit)
+            {
+                watchpoint_hit = false;
+                return;
+            }
         }
     });
 
@@ -93,6 +98,31 @@ int main(int ac, char** av)
         for(int i = 0;i<breakpoints.size();i++)
         {
           printf("Breakpoint %d at address %08x\n", i + 1, breakpoints[i]);
+        }
+    });
+    
+    new Command("wp", "Sets a watchpoint for the emulated processor", [&] (std::vector<std::string> args)
+    {
+        if(args.size() < 3) return;
+        int access = 0;
+        if(args[2] == "r") access = WATCHPOINT_R;
+        else if(args[2] == "w") access = WATCHPOINT_W; 
+        else access = WATCHPOINT_RW;  
+        watchpoints.push_back({strtoull(args[0].c_str(),nullptr,16), strtoull(args[1].c_str(),nullptr,16), access});
+        printf("Watchpoint %d set\n",watchpoints.size());
+    });
+
+    new Command("wpdel", "Deletes a watchpoint for the emulated processor", [&] (std::vector<std::string> args)
+    {
+        if(args.size() < 1) return;
+        watchpoints.erase(watchpoints.begin() + strtoull(args[0].c_str(),nullptr,10) - 1);
+    });
+
+    new Command("wplist", "Lists all watchpoints for the emulated processor", [&] (std::vector<std::string> args)
+    {
+        for(int i = 0;i<watchpoints.size();i++)
+        {
+          printf("Watchpoint %d from address %08x to address %08x, access %s\n", i + 1, watchpoints[i].start, watchpoints[i].end, (watchpoints[i].access == WATCHPOINT_R) ? "r" : ((watchpoints[i].access == WATCHPOINT_W) ? "w" : "rw"));
         }
     });
 
