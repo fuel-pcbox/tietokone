@@ -11,6 +11,7 @@ char *input(const char *prompt);
 
 int main(int ac, char** av)
 {
+    if(ac < 2) return;
     FILE* biosfp = fopen(av[1],"rb");
 
     fseek(biosfp,0,SEEK_END);
