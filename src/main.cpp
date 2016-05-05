@@ -60,6 +60,17 @@ int main(int ac, char** av)
         printf("CS=%04x DS=%04x ES=%04x SS=%04x FS=%04x GS=%04x\n",maincpu.CS,maincpu.DS,maincpu.ES,maincpu.SS,maincpu.FS,maincpu.GS);
     });
 
+    new Command("peek", "Reads a byte in the emulated processor's address space", [&] (std::vector<std::string> args)
+    {
+        u8 tmp = cpu_readbyte(strtoull(args[0].c_str(),nullptr,16));
+        printf("The byte at address %08x is %02x\n", strtoull(args[0].c_str(),nullptr,16), tmp);
+    });
+
+    new Command("poke", "Sets a breakpoint for the emulated processor", [&] (std::vector<std::string> args)
+    {
+        cpu_writebyte(strtoull(args[0].c_str(),nullptr,16), strtoull(args[1].c_str(),nullptr,16) & 0xff);
+    });
+
     new Command("bp", "Sets a breakpoint for the emulated processor", [&] (std::vector<std::string> args)
     {
         breakpoints.push_back(strtoull(args[0].c_str(),nullptr,16));
