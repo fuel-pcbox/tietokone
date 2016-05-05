@@ -53,6 +53,7 @@ void cpu::init()
     CS = 0xf000;
     ip = 0xfff0;
     cr[0] = 0;
+    zero = 0;
 
     for(int i = 0; i<8; i++)
     {

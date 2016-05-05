@@ -35,7 +35,7 @@ struct cpu
 
     u32 flags;
     u32 ip;
-    u16 zero;
+    u32 zero;
 
     struct x86seg
     {

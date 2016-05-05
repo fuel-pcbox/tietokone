@@ -64,7 +64,12 @@ int main(int ac, char** av)
     {
         printf("EAX=%08x EBX=%08x ECX=%08x EDX=%08x\n",maincpu.AX.l,maincpu.BX.l,maincpu.CX.l,maincpu.DX.l);
         printf("ESP=%08x EBP=%08x ESI=%08x EDI=%08x\n",maincpu.SP.l,maincpu.BP.l,maincpu.SI.l,maincpu.DI.l);
-        printf("CS=%04x DS=%04x ES=%04x SS=%04x FS=%04x GS=%04x\n",maincpu.CS,maincpu.DS,maincpu.ES,maincpu.SS,maincpu.FS,maincpu.GS);
+        printf("CS=%04x CS base=%08x CS limit=%08x CS access=%02x\n", segs[1].seg, segs[1].base, segs[1].limit, segs[1].access);
+        printf("DS=%04x DS base=%08x DS limit=%08x DS access=%02x\n", segs[3].seg, segs[3].base, segs[3].limit, segs[3].access);
+        printf("ES=%04x ES base=%08x ES limit=%08x ES access=%02x\n", segs[0].seg, segs[0].base, segs[0].limit, segs[0].access);
+        printf("SS=%04x SS base=%08x SS limit=%08x SS access=%02x\n", segs[2].seg, segs[2].base, segs[2].limit, segs[2].access);
+        printf("FS=%04x FS base=%08x FS limit=%08x FS access=%02x\n", segs[4].seg, segs[4].base, segs[4].limit, segs[4].access);
+        printf("GS=%04x GS base=%08x GS limit=%08x GS access=%02x\n", segs[5].seg, segs[5].base, segs[5].limit, segs[5].access);
     });
 
     new Command("peekb", "Reads a byte in the emulated processor's address space", [&] (std::vector<std::string> args)
