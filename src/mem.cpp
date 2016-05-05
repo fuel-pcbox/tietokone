@@ -73,6 +73,7 @@ u8 cpu_readbyte(u64 addr)
     {
         if(addr>memhandlers[i].start && addr<memhandlers[i].end) return memhandlers[i].rb(addr-memhandlers[i].start);
     }
+    log_print("Memory", debug, "Unmapped memory read at %08x\n", addr);
 }
 
 u16 cpu_readword(u64 addr)
@@ -81,6 +82,7 @@ u16 cpu_readword(u64 addr)
     {
         if(addr>memhandlers[i].start && (addr+1)<memhandlers[i].end) return memhandlers[i].rw(addr-memhandlers[i].start);
     }
+    log_print("Memory", debug, "Unmapped memory read at %08x\n", addr);
 }
 
 u32 cpu_readlong(u64 addr)
@@ -89,6 +91,7 @@ u32 cpu_readlong(u64 addr)
     {
         if(addr>memhandlers[i].start && (addr+3)<memhandlers[i].end) return memhandlers[i].rl(addr-memhandlers[i].start);
     }
+    log_print("Memory", debug, "Unmapped memory read at %08x\n", addr);
 }
 
 void cpu_writebyte(u64 addr, u8 data)
@@ -101,6 +104,7 @@ void cpu_writebyte(u64 addr, u8 data)
             return;
         }
     }
+    log_print("Memory", debug, "Unmapped memory write at %08x with value %02x\n", addr, data);
 }
 
 void cpu_writeword(u64 addr, u16 data)
@@ -113,6 +117,7 @@ void cpu_writeword(u64 addr, u16 data)
             return;
         }
     }
+    log_print("Memory", debug, "Unmapped memory write at %08x with value %04x\n", addr, data);
 }
 
 void cpu_writelong(u64 addr, u32 data)
@@ -125,6 +130,7 @@ void cpu_writelong(u64 addr, u32 data)
             return;
         }
     }
+    log_print("Memory", debug, "Unmapped memory write at %08x with value %08x\n", addr, data);
 }
 
 
