@@ -62,23 +62,28 @@ int main(int ac, char** av)
 
     new Command("peekb", "Reads a byte in the emulated processor's address space", [&] (std::vector<std::string> args)
     {
+        if(!args[0]) return;
         u8 tmp = cpu_readbyte(strtoull(args[0].c_str(),nullptr,16));
         printf("The byte at address %08x is %02x\n", strtoull(args[0].c_str(),nullptr,16), tmp);
     });
 
     new Command("pokeb", "Sets a breakpoint for the emulated processor", [&] (std::vector<std::string> args)
     {
+        if(!args[0]) return;
+        if(!args[1]) return;
         cpu_writebyte(strtoull(args[0].c_str(),nullptr,16), strtoull(args[1].c_str(),nullptr,16) & 0xff);
     });
 
     new Command("bp", "Sets a breakpoint for the emulated processor", [&] (std::vector<std::string> args)
     {
+        if(!args[0]) return;
         breakpoints.push_back(strtoull(args[0].c_str(),nullptr,16));
         printf("Breakpoint %d set\n",breakpoints.size());
     });
 
     new Command("bpdel", "Deletes a breakpoint for the emulated processor", [&] (std::vector<std::string> args)
     {
+        if(!args[0]) return;
         breakpoints.erase(breakpoints.begin() + strtoull(args[0].c_str(),nullptr,10) - 1);
     });
 
