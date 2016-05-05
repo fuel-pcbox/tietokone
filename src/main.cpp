@@ -84,7 +84,7 @@ int main(int ac, char** av)
 
     new Command("bplist", "Lists all breakpoints for the emulated processor", [&] (std::vector<std::string> args)
     {
-        for(int i = 0;i<breakpoints.size;i++)
+        for(int i = 0;i<breakpoints.size();i++)
         {
           printf("Breakpoint %d at address %08x\n", i + 1, breakpoints[i]);
         }

@@ -8,7 +8,7 @@ memhandler kbhandler =
     {
         return 0;
     },
-    nullptr, nullptr
+    nullptr, nullptr,
 
     nullptr, nullptr, nullptr
 };
