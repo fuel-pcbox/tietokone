@@ -1,5 +1,33 @@
 #include "cpu.h"
 
+void jump_if_o(cpu* maincpu)
+{
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    if(maincpu->flags & 0x800) maincpu->ip += (s8)tmp;
+    maincpu->ip+=2;
+}
+
+void jump_if_no(cpu* maincpu)
+{
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    if(!(maincpu->flags & 0x800)) maincpu->ip += (s8)tmp;
+    maincpu->ip+=2;
+}
+
+void jump_if_c(cpu* maincpu)
+{
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    if(maincpu->flags & 0x1) maincpu->ip += (s8)tmp;
+    maincpu->ip+=2;
+}
+
+void jump_if_nc(cpu* maincpu)
+{
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    if(!(maincpu->flags & 0x1)) maincpu->ip += (s8)tmp;
+    maincpu->ip+=2;
+}
+
 void jump_if_z(cpu* maincpu)
 {
     u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);

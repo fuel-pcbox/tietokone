@@ -76,8 +76,13 @@ struct cpu
 
 void unknown(cpu* maincpu);
 
+void add_b_rmw_a16(cpu* maincpu);
 void xor_w_rmw_a16(cpu* maincpu);
 void cmp_al_imm(cpu* maincpu);
+void jump_if_o(cpu* maincpu);
+void jump_if_no(cpu* maincpu);
+void jump_if_c(cpu* maincpu);
+void jump_if_nc(cpu* maincpu);
 void jump_if_z(cpu* maincpu);
 void jump_if_nz(cpu* maincpu);
 void mov_b_r_a16(cpu* maincpu);
