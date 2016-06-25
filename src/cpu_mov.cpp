@@ -1,4 +1,5 @@
 #include "cpu.h"
+#include "mem.h"
 
 void mov_b_r_a16(cpu* maincpu)
 {

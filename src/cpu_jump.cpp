@@ -1,4 +1,5 @@
 #include "cpu.h"
+#include "mem.h"
 
 void jump_if_o(cpu* maincpu)
 {

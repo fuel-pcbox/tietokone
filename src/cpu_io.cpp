@@ -1,4 +1,5 @@
 #include "cpu.h"
+#include "mem.h"
 
 void in_al_imm(cpu* maincpu)
 {

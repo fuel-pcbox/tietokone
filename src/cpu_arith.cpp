@@ -1,4 +1,5 @@
 #include "cpu.h"
+#include "mem.h"
 
 void add_b_rmw_a16(cpu* maincpu)
 {
