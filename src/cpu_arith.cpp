@@ -70,3 +70,113 @@ void test_al_imm(cpu* maincpu)
     maincpu->setznp8(maincpu->AX.b[0] & tmp);
     maincpu->ip+=2;
 }
+
+void grp2_eb_1(cpu* maincpu)
+{
+    u8 modrm = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    switch(modrm & 0x38)
+    {
+        case 0x20:
+        {
+            maincpu->fetch_ea_16(modrm);
+            if(maincpu->mod == 3)
+            {
+                u16 src = maincpu->regs[maincpu->rm].w;
+                maincpu->setznp16(src << maincpu->CX.b[0]);
+                if(src& 0x80) maincpu->flags |= 1;
+                else maincpu->flags &= ~1;
+                if((src & 0x80) ^ ((src & 0x40) << 1)) maincpu->flags |= 0x800;
+                else maincpu->flags &= ~0x800;
+                maincpu->regs[maincpu->rm].w = src << maincpu->CX.b[0];
+            }
+            else
+            {
+                u16 src = cpu_readword(maincpu->ea_seg_base + maincpu->ea_addr);
+		        maincpu->setznp16(src << maincpu->CX.b[0]);
+                if(src & 0x80) maincpu->flags |= 1;
+                else maincpu->flags &= ~1;
+                if((src & 0x80) ^ ((src & 0x40) << 1)) maincpu->flags |= 0x800;
+                else maincpu->flags &= ~0x800;
+                cpu_writeword(maincpu->ea_seg_base + maincpu->ea_addr, src << maincpu->CX.b[0]);
+            }
+            break;
+        }
+        case 0x28:
+        {
+            maincpu->fetch_ea_16(modrm);
+            if(maincpu->mod == 3)
+            {
+                u16 src = maincpu->regs[maincpu->rm].w;
+                maincpu->setznp16(src >> 1);
+                if(src & 1) maincpu->flags |= 1;
+                else maincpu->flags &= ~1;
+                if(src & 0x80) maincpu->flags |= 0x800;
+                else maincpu->flags &= ~0x800;
+                maincpu->regs[maincpu->rm].w = src >> 1;
+            }
+            else
+            {
+                u16 src = cpu_readword(maincpu->ea_seg_base + maincpu->ea_addr);
+		        maincpu->setznp16(src >> 1);
+                if(src & 1) maincpu->flags |= 1;
+                else maincpu->flags &= ~1;
+                if(src & 0x80) maincpu->flags |= 0x800;
+                else maincpu->flags &= ~0x800;
+                cpu_writeword(maincpu->ea_seg_base + maincpu->ea_addr, src >> 1);
+            }
+            break;
+        }
+    }
+    maincpu->ip+=2;
+}
+
+void grp2_eb_cl(cpu* maincpu)
+{
+    u8 modrm = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    switch(modrm & 0x38)
+    {
+        case 0x20:
+        {
+            maincpu->fetch_ea_16(modrm);
+            if(maincpu->mod == 3)
+            {
+                u16 src = maincpu->regs[maincpu->rm].w;
+                maincpu->setznp16(src << maincpu->CX.b[0]);
+                if((src << (maincpu->CX.b[0] - 1)) & 0x80) maincpu->flags |= 1;
+                else maincpu->flags &= ~1;
+                maincpu->regs[maincpu->rm].w = src << maincpu->CX.b[0];
+            }
+            else
+            {
+                u16 src = cpu_readword(maincpu->ea_seg_base + maincpu->ea_addr);
+		        maincpu->setznp16(src << maincpu->CX.b[0]);
+                if((src << (maincpu->CX.b[0] - 1)) & 0x80) maincpu->flags |= 1;
+                else maincpu->flags &= ~1;
+                cpu_writeword(maincpu->ea_seg_base + maincpu->ea_addr, src << maincpu->CX.b[0]);
+            }
+            break;
+        }
+        case 0x28:
+        {
+            maincpu->fetch_ea_16(modrm);
+            if(maincpu->mod == 3)
+            {
+                u16 src = maincpu->regs[maincpu->rm].w;
+                maincpu->setznp16(src >> maincpu->CX.b[0]);
+                if((src >> (maincpu->CX.b[0] - 1)) & 1) maincpu->flags |= 1;
+                else maincpu->flags &= ~1;
+                maincpu->regs[maincpu->rm].w = src >> maincpu->CX.b[0];
+            }
+            else
+            {
+                u16 src = cpu_readword(maincpu->ea_seg_base + maincpu->ea_addr);
+		        maincpu->setznp16(src >> maincpu->CX.b[0]);
+                if((src >> (maincpu->CX.b[0] - 1)) & 1) maincpu->flags |= 1;
+                else maincpu->flags &= ~1;
+                cpu_writeword(maincpu->ea_seg_base + maincpu->ea_addr, src >> maincpu->CX.b[0]);
+            }
+            break;
+        }
+    }
+    maincpu->ip+=2;
+}

@@ -18,12 +18,20 @@ static cpu_op_template optbl_16d_16a[] =
     {0x73, jump_if_nc},
     {0x74, jump_if_z},
     {0x75, jump_if_nz},
+    {0x76, jump_if_be},
+    {0x77, jump_if_a},
+    {0x78, jump_if_s},
+    {0x79, jump_if_ns},
+    {0x7a, jump_if_p},
+    {0x7b, jump_if_np},
     {0x88, mov_b_r_a16},
     {0x89, mov_w_r_a16},
     {0x8b, mov_r_w_a16},
     {0x8c, mov_w_seg_a16},
     {0x8e, mov_seg_w_a16},
     {0x90, nop},
+    {0x9e, sahf},
+    {0x9f, lahf},
     {0xa8, test_al_imm},
     {0xb0, mov_al_imm},
     {0xb1, mov_cl_imm},
@@ -41,6 +49,8 @@ static cpu_op_template optbl_16d_16a[] =
     {0xbd, mov_bp_imm},
     {0xbe, mov_si_imm},
     {0xbf, mov_di_imm},
+    {0xd0, grp2_eb_1},
+    {0xd2, grp2_eb_cl},
     {0xe4, in_al_imm},
     {0xe5, in_ax_imm},
     {0xe6, out_al_imm},
@@ -59,6 +69,7 @@ void cpu::init()
     ip = 0xfff0;
     cr[0] = 0;
     zero = 0;
+    flags = 0x0002;
 
     for(int i = 0; i<8; i++)
     {

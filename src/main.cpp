@@ -18,7 +18,7 @@ int main(int ac, char** av)
     long biossize = ftell(biosfp);
     fseek(biosfp,0,SEEK_SET);
 
-    fread(bios+0x10000,biossize,1,biosfp);
+    fread(bios+0x1e000,biossize,1,biosfp);
 
     fclose(biosfp);
 
@@ -28,17 +28,24 @@ int main(int ac, char** av)
     keyboard_init();
 
     cpu maincpu;
+    maincpu.type = cputype::cpu_8086;
 
-    printf("Tietokone 386 PC Emulator by the Tietokone Team\n");
+    printf("Tietokone PC Emulator by the Tietokone Team\n");
     Command::loadCLI();
 
-    new Command("start", "Start the emulated processor", [&] (std::vector<std::string> args)
+    new Command("start", "Starts the emulated processor", [&] (std::vector<std::string> args)
     {
         maincpu.init();
     });
 
+    new Command("proctype", "Sets the processor type", [&] (std::vector<std::string> args)
+    {
+        if(args[0] == "8086" || args[0] == "8088") maincpu.type = cputype::cpu_8086;
+        else if(args[0] == "286") maincpu.type = cputype::cpu_286;
+        else if(args[0] == "386") maincpu.type = cputype::cpu_386;
+    });
 
-    new Command("run", "Run the emulated processor", [&] (std::vector<std::string> args)
+    new Command("run", "Runs the emulated processor", [&] (std::vector<std::string> args)
     {
         for(int i = 0; i<50; i++)
         {
@@ -55,7 +62,7 @@ int main(int ac, char** av)
         }
     });
 
-    new Command("step", "Single-step the emulated processor", [&] (std::vector<std::string> args)
+    new Command("step", "Single-steps the emulated processor", [&] (std::vector<std::string> args)
     {
         maincpu.tick();
     });
@@ -70,6 +77,7 @@ int main(int ac, char** av)
         printf("SS=%04x SS base=%08x SS limit=%08x SS access=%02x\n", maincpu.segs[2].seg, maincpu.segs[2].base, maincpu.segs[2].limit, maincpu.segs[2].access);
         printf("FS=%04x FS base=%08x FS limit=%08x FS access=%02x\n", maincpu.segs[4].seg, maincpu.segs[4].base, maincpu.segs[4].limit, maincpu.segs[4].access);
         printf("GS=%04x GS base=%08x GS limit=%08x GS access=%02x\n", maincpu.segs[5].seg, maincpu.segs[5].base, maincpu.segs[5].limit, maincpu.segs[5].access);
+        printf("EFLAGS=%08x\n", maincpu.flags);
     });
 
     new Command("peekb", "Reads a byte in the emulated processor's address space", [&] (std::vector<std::string> args)
@@ -79,7 +87,7 @@ int main(int ac, char** av)
         printf("The byte at address %08x is %02x\n", strtoull(args[0].c_str(),nullptr,16), tmp);
     });
 
-    new Command("pokeb", "Sets a breakpoint for the emulated processor", [&] (std::vector<std::string> args)
+    new Command("pokeb", "WRites a byte in the emulated processor's address space", [&] (std::vector<std::string> args)
     {
         if(args.size() < 2) return;
         cpu_writebyte(strtoull(args[0].c_str(),nullptr,16), strtoull(args[1].c_str(),nullptr,16) & 0xff);

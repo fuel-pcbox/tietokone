@@ -43,6 +43,48 @@ void jump_if_nz(cpu* maincpu)
     maincpu->ip+=2;
 }
 
+void jump_if_be(cpu* maincpu)
+{
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    if((maincpu->flags & 0x40) || (maincpu->flags & 1)) maincpu->ip += (s8)tmp;
+    maincpu->ip+=2;
+}
+
+void jump_if_a(cpu* maincpu)
+{
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    if(!((maincpu->flags & 0x40) || (maincpu->flags & 1))) maincpu->ip += (s8)tmp;
+    maincpu->ip+=2;
+}
+
+void jump_if_s(cpu* maincpu)
+{
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    if(maincpu->flags & 0x80) maincpu->ip += (s8)tmp;
+    maincpu->ip+=2;
+}
+
+void jump_if_ns(cpu* maincpu)
+{
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    if(!(maincpu->flags & 0x80)) maincpu->ip += (s8)tmp;
+    maincpu->ip+=2;
+}
+
+void jump_if_p(cpu* maincpu)
+{
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    if(maincpu->flags & 0x04) maincpu->ip += (s8)tmp;
+    maincpu->ip+=2;
+}
+
+void jump_if_np(cpu* maincpu)
+{
+    u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    if(!(maincpu->flags & 0x04)) maincpu->ip += (s8)tmp;
+    maincpu->ip+=2;
+}
+
 void jmp_r16(cpu* maincpu)
 {
     u16 off = cpu_readword(maincpu->cs + maincpu->ip + 1);

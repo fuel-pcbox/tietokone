@@ -24,8 +24,15 @@
 #define seg_fs segs[4].base
 #define gs segs[5].base
 
+enum class cputype
+{
+    cpu_8086, cpu_286, cpu_386
+};
+
 struct cpu
 {
+    cputype type;
+
     union x86reg
     {
         u32 l;
@@ -85,12 +92,20 @@ void jump_if_c(cpu* maincpu);
 void jump_if_nc(cpu* maincpu);
 void jump_if_z(cpu* maincpu);
 void jump_if_nz(cpu* maincpu);
+void jump_if_be(cpu* maincpu);
+void jump_if_a(cpu* maincpu);
+void jump_if_s(cpu* maincpu);
+void jump_if_ns(cpu* maincpu);
+void jump_if_p(cpu* maincpu);
+void jump_if_np(cpu* maincpu);
 void mov_b_r_a16(cpu* maincpu);
 void mov_w_r_a16(cpu* maincpu);
 void mov_r_w_a16(cpu* maincpu);
 void mov_w_seg_a16(cpu* maincpu);
 void mov_seg_w_a16(cpu* maincpu);
 void nop(cpu* maincpu);
+void sahf(cpu* maincpu);
+void lahf(cpu* maincpu);
 void test_al_imm(cpu* maincpu);
 void mov_al_imm(cpu* maincpu);
 void mov_cl_imm(cpu* maincpu);
@@ -108,6 +123,8 @@ void mov_sp_imm(cpu* maincpu);
 void mov_bp_imm(cpu* maincpu);
 void mov_si_imm(cpu* maincpu);
 void mov_di_imm(cpu* maincpu);
+void grp2_eb_1(cpu* maincpu);
+void grp2_eb_cl(cpu* maincpu);
 void in_al_imm(cpu* maincpu);
 void in_ax_imm(cpu* maincpu);
 void out_al_imm(cpu* maincpu);
