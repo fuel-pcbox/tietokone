@@ -9,26 +9,15 @@ std::vector<u64> breakpoints;
 std::vector<std::string> splitStrn(const char *str, const char *delim);
 char *input(const char *prompt);
 
+enum class machinetype
+{
+	ibm5150, ibm5155, ibm5160, ibm5162, ibm5170,
+};
+
 int main(int ac, char** av)
 {
-    if(ac < 2) return 1;
-    FILE* biosfp = fopen(av[1],"rb");
-
-    fseek(biosfp,0,SEEK_END);
-    long biossize = ftell(biosfp);
-    fseek(biosfp,0,SEEK_SET);
-
-    fread(bios+0x1e000,biossize,1,biosfp);
-
-    fclose(biosfp);
-
-    log_filter = error | warning | debug | verbose | info;
-
-    mem_init();
-    keyboard_init();
-
     cpu maincpu;
-    maincpu.type = cputype::cpu_8086;
+	machinetype machine;
 
     printf("Tietokone PC Emulator by the Tietokone Team\n");
     Command::loadCLI();
@@ -36,14 +25,49 @@ int main(int ac, char** av)
     new Command("start", "Starts the emulated processor", [&] (std::vector<std::string> args)
     {
         maincpu.init();
+
+		log_filter = all;
+
+		mem_init();
+		keyboard_init();
     });
 
-    new Command("proctype", "Sets the processor type", [&] (std::vector<std::string> args)
-    {
-        if(args[0] == "8086" || args[0] == "8088") maincpu.type = cputype::cpu_8086;
-        else if(args[0] == "286") maincpu.type = cputype::cpu_286;
-        else if(args[0] == "386") maincpu.type = cputype::cpu_386;
-    });
+	new Command("machinetype", "Sets the machine type", [&](std::vector<std::string> args)
+	{
+		if(args.size() < 1) return;
+
+		if(args[0] == "ibm5150") machine = machinetype::ibm5150;
+		else if(args[0] == "ibm5155") machine = machinetype::ibm5155;
+		else if(args[0] == "ibm5160") machine = machinetype::ibm5160;
+		else if(args[0] == "ibm5162") machine = machinetype::ibm5162;
+		else if(args[0] == "ibm5170") machine = machinetype::ibm5170;
+		
+		switch (machine)
+		{
+			case machinetype::ibm5150:
+			{
+				maincpu.type = cputype::i8088;
+				FILE* fp = fopen("roms/machines/ibmpc/pc102782.bin", "rb");
+				if (!fp)
+				{
+					printf("Error loading IBM 5150 BIOS\n");
+					return;
+				}
+				fread(bios + 0x1e000, 0x2000,1,fp);
+				fclose(fp);
+
+				fp = fopen("roms/machines/ibmpc/ibm-basic-1.10.rom", "rb");
+				if (!fp)
+				{
+					printf("Error loading IBM 5150 ROM BASIC\n");
+					return;
+				}
+				fread(bios + 0x16000, 0x8000, 1, fp);
+				fclose(fp);
+				break;
+			}
+		}
+	});
 
     new Command("run", "Runs the emulated processor", [&] (std::vector<std::string> args)
     {
@@ -84,10 +108,10 @@ int main(int ac, char** av)
     {
         if(args.size() < 1) return;
         u8 tmp = cpu_readbyte(strtoull(args[0].c_str(),nullptr,16));
-        printf("The byte at address %08x is %02x\n", strtoull(args[0].c_str(),nullptr,16), tmp);
+        printf("The byte at address %llux is %02x\n", strtoull(args[0].c_str(),nullptr,16), tmp);
     });
 
-    new Command("pokeb", "WRites a byte in the emulated processor's address space", [&] (std::vector<std::string> args)
+    new Command("pokeb", "Writes a byte in the emulated processor's address space", [&] (std::vector<std::string> args)
     {
         if(args.size() < 2) return;
         cpu_writebyte(strtoull(args[0].c_str(),nullptr,16), strtoull(args[1].c_str(),nullptr,16) & 0xff);
@@ -103,14 +127,14 @@ int main(int ac, char** av)
     new Command("bpdel", "Deletes a breakpoint for the emulated processor", [&] (std::vector<std::string> args)
     {
         if(args.size() < 1) return;
-        breakpoints.erase(breakpoints.begin() + strtoull(args[0].c_str(),nullptr,10) - 1);
+        breakpoints.erase(breakpoints.begin() + strtoull(args[0].c_str(),nullptr,16) - 1);
     });
 
     new Command("bplist", "Lists all breakpoints for the emulated processor", [&] (std::vector<std::string> args)
     {
-        for(int i = 0;i<breakpoints.size();i++)
+        for(unsigned i = 0;i<breakpoints.size();i++)
         {
-          printf("Breakpoint %d at address %08x\n", i + 1, breakpoints[i]);
+          printf("Breakpoint %d at address %llux\n", i + 1, breakpoints[i]);
         }
     });
     
@@ -144,20 +168,20 @@ int main(int ac, char** av)
         int addrspace = 0;
         if(args[1] == "mem") addrspace = 0;
         else if(args[1] == "io") addrspace = 1;
-        if(addrspace == 0) memwatchpoints.erase(memwatchpoints.begin() + strtoull(args[0].c_str(),nullptr,10) - 1);
-        else if (addrspace == 1) iowatchpoints.erase(memwatchpoints.begin() + strtoull(args[0].c_str(),nullptr,10) - 1);
+        if(addrspace == 0) memwatchpoints.erase(memwatchpoints.begin() + strtoull(args[0].c_str(),nullptr,16) - (uint64_t)1);
+        else if (addrspace == 1) iowatchpoints.erase(memwatchpoints.begin() + strtoull(args[0].c_str(),nullptr,16) - (uint64_t)1);
     });
 
     new Command("wplist", "Lists all watchpoints for the emulated processor", [&] (std::vector<std::string> args)
     {
-        for(int i = 0;i<memwatchpoints.size();i++)
+        for(unsigned i = 0;i<memwatchpoints.size();i++)
         {
-          printf("Memory Watchpoint %d from address %08x to address %08x, access %s\n", i + 1, memwatchpoints[i].start, memwatchpoints[i].end, (memwatchpoints[i].access == WATCHPOINT_R) ? "r" : ((memwatchpoints[i].access == WATCHPOINT_W) ? "w" : "rw"));
+          printf("Memory Watchpoint %d from address %llux to address %llux, access %s\n", i + 1, memwatchpoints[i].start, memwatchpoints[i].end, (memwatchpoints[i].access == WATCHPOINT_R) ? "r" : ((memwatchpoints[i].access == WATCHPOINT_W) ? "w" : "rw"));
         }
         
-        for(int i = 0;i<iowatchpoints.size();i++)
+        for(unsigned i = 0;i<iowatchpoints.size();i++)
         {
-          printf("I/O Watchpoint %d from address %08x to address %08x, access %s\n", i + 1, iowatchpoints[i].start, iowatchpoints[i].end, (iowatchpoints[i].access == WATCHPOINT_R) ? "r" : ((iowatchpoints[i].access == WATCHPOINT_W) ? "w" : "rw"));
+          printf("I/O Watchpoint %d from address %llux to address %llux, access %s\n", i + 1, iowatchpoints[i].start, iowatchpoints[i].end, (iowatchpoints[i].access == WATCHPOINT_R) ? "r" : ((iowatchpoints[i].access == WATCHPOINT_W) ? "w" : "rw"));
         }
     });
 

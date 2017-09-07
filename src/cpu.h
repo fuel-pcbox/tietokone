@@ -26,7 +26,7 @@
 
 enum class cputype
 {
-    cpu_8086, cpu_286, cpu_386
+    i8088, i8086, i286, i386
 };
 
 struct cpu

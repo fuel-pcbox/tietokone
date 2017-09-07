@@ -41,7 +41,7 @@ public:
         });
         new Command("hlp", "View the CLI Commands", [&] (std::vector<std::string> args) {
             for(int i = 0; i < (signed) myCommands.size(); i++) {
-                printf("%s\t%s\n", myCommands.at(i).toString().c_str(), myCommands.at(i).getHelp().c_str());
+                printf("%s:\n\t%s\n", myCommands.at(i).toString().c_str(), myCommands.at(i).getHelp().c_str());
             }
         });
     }

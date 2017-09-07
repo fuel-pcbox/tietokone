@@ -25,6 +25,6 @@ void out_al_imm(cpu* maincpu)
 void out_ax_imm(cpu* maincpu)
 {
     u8 tmp = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
-    cpu_iowritebyte(tmp, maincpu->AX.w);
+    cpu_iowriteword(tmp, maincpu->AX.w);
     maincpu->ip+=2;
 }
