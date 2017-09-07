@@ -66,6 +66,19 @@ int main(int ac, char** av)
 				fclose(fp);
 				break;
 			}
+			case machinetype::ibm5160:
+			{
+				maincpu.type = cputype::i8088;
+				FILE* fp = fopen("roms/machines/ibmxt/xt.rom", "rb");
+				if (!fp)
+				{
+					printf("Error loading IBM 5160 BIOS\n");
+					return;
+				}
+				fread(bios + 0x10000, 0x10000, 1, fp);
+				fclose(fp);
+				break;
+			}
 		}
 	});
 
