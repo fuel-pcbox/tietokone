@@ -32,7 +32,7 @@ int main(int ac, char** av)
 		keyboard_init();
     });
 
-	new Command("machinetype", "Sets the machine type", [&](std::vector<std::string> args)
+	new Command("machine", "Sets the machine type", [&](std::vector<std::string> args)
 	{
 		if(args.size() < 1) return;
 
