@@ -11,7 +11,7 @@ char *input(const char *prompt);
 
 enum class machinetype
 {
-	ibm5150, ibm5155, ibm5160, ibm5162, ibm5170,
+	ibm5150, ibm5155, ibm5160, genxt, ibm5162, ibm5170,
 };
 
 int main(int ac, char** av)
@@ -39,6 +39,7 @@ int main(int ac, char** av)
 		if(args[0] == "ibm5150") machine = machinetype::ibm5150;
 		else if(args[0] == "ibm5155") machine = machinetype::ibm5155;
 		else if(args[0] == "ibm5160") machine = machinetype::ibm5160;
+		else if(args[0] == "genxt") machine = machinetype::genxt;
 		else if(args[0] == "ibm5162") machine = machinetype::ibm5162;
 		else if(args[0] == "ibm5170") machine = machinetype::ibm5170;
 		
@@ -76,6 +77,19 @@ int main(int ac, char** av)
 					return;
 				}
 				fread(bios + 0x10000, 0x10000, 1, fp);
+				fclose(fp);
+				break;
+			}
+			case machinetype::genxt:
+			{
+				maincpu.type = cputype::i8088;
+				FILE* fp = fopen("roms/machines/genxt/pcxt.rom", "rb");
+				if (!fp)
+				{
+					printf("Error loading Generic XT BIOS\n");
+					return;
+				}
+				fread(bios + 0x1E000, 0x2000, 1, fp);
 				fclose(fp);
 				break;
 			}
