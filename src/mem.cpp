@@ -75,12 +75,12 @@ u8 cpu_readbyte(u64 addr)
 {
     for(auto w : memwatchpoints)
     {
-        if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_R)) watchpoint_hit = true;
+        if(addr >= w.start && addr <= w.end && (w.access & WATCHPOINT_R)) watchpoint_hit = true;
     }
     
     for(unsigned i = 0; i < memhandlers.size(); i++)
     {
-        if(addr>memhandlers[i].start && addr<=memhandlers[i].end) return memhandlers[i].rb(addr-memhandlers[i].start);
+        if(addr>=memhandlers[i].start && addr<=memhandlers[i].end) return memhandlers[i].rb(addr-memhandlers[i].start);
     }
     log_print("Memory", debug, "Unmapped memory read at %08x\n", addr);
 	return 0xff;
@@ -90,12 +90,12 @@ u16 cpu_readword(u64 addr)
 {
     for(auto w : memwatchpoints)
     {
-        if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_R)) watchpoint_hit = true;
+        if(addr >= w.start && addr <= w.end && (w.access & WATCHPOINT_R)) watchpoint_hit = true;
     }
     
     for(unsigned i = 0; i < memhandlers.size(); i++)
     {
-        if(addr>memhandlers[i].start && (addr+1)<=memhandlers[i].end) return memhandlers[i].rw(addr-memhandlers[i].start);
+        if(addr>=memhandlers[i].start && (addr+1)<=memhandlers[i].end) return memhandlers[i].rw(addr-memhandlers[i].start);
     }
     log_print("Memory", debug, "Unmapped memory read at %08x\n", addr);
 	return 0xffff;
@@ -105,12 +105,12 @@ u32 cpu_readlong(u64 addr)
 {
     for(auto w : memwatchpoints)
     {
-        if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_R)) watchpoint_hit = true;
+        if(addr >= w.start && addr <= w.end && (w.access & WATCHPOINT_R)) watchpoint_hit = true;
     }
     
     for(unsigned i = 0; i < memhandlers.size(); i++)
     {
-        if(addr>memhandlers[i].start && (addr+3)<=memhandlers[i].end) return memhandlers[i].rl(addr-memhandlers[i].start);
+        if(addr>=memhandlers[i].start && (addr+3)<=memhandlers[i].end) return memhandlers[i].rl(addr-memhandlers[i].start);
     }
     log_print("Memory", debug, "Unmapped memory read at %08x\n", addr);
 	return 0xffffffff;
@@ -120,12 +120,12 @@ void cpu_writebyte(u64 addr, u8 data)
 {
     for(auto w : memwatchpoints)
     {
-        if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_W)) watchpoint_hit = true;
+        if(addr >= w.start && addr <= w.end && (w.access & WATCHPOINT_W)) watchpoint_hit = true;
     }
     
     for(unsigned i = 0; i < memhandlers.size(); i++)
     {
-        if(addr>memhandlers[i].start && addr<=memhandlers[i].end)
+        if(addr>=memhandlers[i].start && addr<=memhandlers[i].end)
         {
             memhandlers[i].wb(addr-memhandlers[i].start, data);
             return;
@@ -138,12 +138,12 @@ void cpu_writeword(u64 addr, u16 data)
 {
     for(auto w : memwatchpoints)
     {
-        if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_W)) watchpoint_hit = true;
+        if(addr >= w.start && addr <= w.end && (w.access & WATCHPOINT_W)) watchpoint_hit = true;
     }
     
     for(unsigned i = 0; i < memhandlers.size(); i++)
     {
-        if(addr>memhandlers[i].start && (addr+1)<=memhandlers[i].end)
+        if(addr>=memhandlers[i].start && (addr+1)<=memhandlers[i].end)
         {
             memhandlers[i].ww(addr-memhandlers[i].start, data);
             return;
@@ -156,12 +156,12 @@ void cpu_writelong(u64 addr, u32 data)
 {
     for(auto w : memwatchpoints)
     {
-        if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_W)) watchpoint_hit = true;
+        if(addr >= w.start && addr <= w.end && (w.access & WATCHPOINT_W)) watchpoint_hit = true;
     }
     
     for(unsigned i = 0; i < memhandlers.size(); i++)
     {
-        if(addr>memhandlers[i].start && (addr+3)<=memhandlers[i].end)
+        if(addr>=memhandlers[i].start && (addr+3)<=memhandlers[i].end)
         {
             memhandlers[i].wl(addr-memhandlers[i].start, data);
             return;
@@ -175,12 +175,12 @@ u8 cpu_ioreadbyte(u64 addr)
 {
     for(auto w : iowatchpoints)
     {
-        if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_R)) watchpoint_hit = true;
+        if(addr >= w.start && addr <= w.end && (w.access & WATCHPOINT_R)) watchpoint_hit = true;
     }
     
     for(unsigned i = 0; i < iohandlers.size(); i++)
     {
-        if(addr>iohandlers[i].start && addr<=iohandlers[i].end) return iohandlers[i].rb(addr-iohandlers[i].start);
+        if(addr>=iohandlers[i].start && addr<=iohandlers[i].end) return iohandlers[i].rb(addr-iohandlers[i].start);
     }
 	return 0xff;
 }
@@ -189,7 +189,7 @@ u16 cpu_ioreadword(u64 addr)
 {
     for(auto w : iowatchpoints)
     {
-        if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_R)) watchpoint_hit = true;
+        if(addr >= w.start && addr <= w.end && (w.access & WATCHPOINT_R)) watchpoint_hit = true;
     }
     
     for(unsigned i = 0; i < iohandlers.size(); i++)
@@ -203,12 +203,12 @@ u32 cpu_ioreadlong(u64 addr)
 {
     for(auto w : iowatchpoints)
     {
-        if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_R)) watchpoint_hit = true;
+        if(addr >= w.start && addr <= w.end && (w.access & WATCHPOINT_R)) watchpoint_hit = true;
     }
     
     for(unsigned i = 0; i < iohandlers.size(); i++)
     {
-        if(addr>iohandlers[i].start && (addr+3)<=iohandlers[i].end) return iohandlers[i].rl(addr-iohandlers[i].start);
+        if(addr>=iohandlers[i].start && (addr+3)<=iohandlers[i].end) return iohandlers[i].rl(addr-iohandlers[i].start);
     }
 	return 0xffffffff;
 }
@@ -217,12 +217,12 @@ void cpu_iowritebyte(u64 addr, u8 data)
 {
     for(auto w : iowatchpoints)
     {
-        if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_W)) watchpoint_hit = true;
+        if(addr >= w.start && addr <= w.end && (w.access & WATCHPOINT_W)) watchpoint_hit = true;
     }
     
     for(unsigned i = 0; i < iohandlers.size(); i++)
     {
-        if(addr>iohandlers[i].start && addr<=iohandlers[i].end)
+        if(addr>=iohandlers[i].start && addr<=iohandlers[i].end)
         {
             iohandlers[i].wb(addr-iohandlers[i].start, data);
             return;
@@ -234,12 +234,12 @@ void cpu_iowriteword(u64 addr, u16 data)
 {
     for(auto w : iowatchpoints)
     {
-        if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_W)) watchpoint_hit = true;
+        if(addr >= w.start && addr <= w.end && (w.access & WATCHPOINT_W)) watchpoint_hit = true;
     }
     
     for(unsigned i = 0; i < iohandlers.size(); i++)
     {
-        if(addr>iohandlers[i].start && (addr+1)<=iohandlers[i].end)
+        if(addr>=iohandlers[i].start && (addr+1)<=iohandlers[i].end)
         {
             iohandlers[i].ww(addr-iohandlers[i].start, data);
             return;
@@ -251,12 +251,12 @@ void cpu_iowritelong(u64 addr, u32 data)
 {
     for(auto w : iowatchpoints)
     {
-        if(addr > w.start && addr <= w.end && (w.access & WATCHPOINT_W)) watchpoint_hit = true;
+        if(addr >= w.start && addr <= w.end && (w.access & WATCHPOINT_W)) watchpoint_hit = true;
     }
     
     for(unsigned i = 0; i < iohandlers.size(); i++)
     {
-        if(addr>iohandlers[i].start && (addr+3)<=iohandlers[i].end)
+        if(addr>=iohandlers[i].start && (addr+3)<=iohandlers[i].end)
         {
             iohandlers[i].wl(addr-iohandlers[i].start, data);
             return;

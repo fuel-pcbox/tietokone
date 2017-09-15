@@ -73,6 +73,7 @@ struct cpu
     u32 ea_addr;
 
     void fetch_ea_16(u8 modrm);
+    u8 get_ea_b(int which_reg);
     void setznp8(u8 val);
     void setznp16(u16 val);
 
@@ -84,7 +85,10 @@ struct cpu
 void unknown(cpu* maincpu);
 
 void add_b_rmw_a16(cpu* maincpu);
+void or_w_rm_a16(cpu* maincpu);
 void xor_w_rmw_a16(cpu* maincpu);
+void xor_b_rm_a16(cpu* maincpu);
+void xor_w_rm_a16(cpu* maincpu);
 void cmp_al_imm(cpu* maincpu);
 void jump_if_o(cpu* maincpu);
 void jump_if_no(cpu* maincpu);
@@ -123,6 +127,7 @@ void mov_sp_imm(cpu* maincpu);
 void mov_bp_imm(cpu* maincpu);
 void mov_si_imm(cpu* maincpu);
 void mov_di_imm(cpu* maincpu);
+void mov_w_imm_a16(cpu* maincpu);
 void grp2_eb_1(cpu* maincpu);
 void grp2_eb_cl(cpu* maincpu);
 void in_al_imm(cpu* maincpu);
@@ -132,5 +137,11 @@ void out_ax_imm(cpu* maincpu);
 void jmp_r16(cpu* maincpu);
 void jmp_far_a16(cpu* maincpu);
 void jmp_r8(cpu* maincpu);
+void in_al_dx(cpu* maincpu);
+void in_ax_dx(cpu* maincpu);
+void out_al_dx(cpu* maincpu);
+void out_ax_dx(cpu* maincpu);
+void clc(cpu* maincpu);
+void stc(cpu* maincpu);
 void cli(cpu* maincpu);
 void cld(cpu* maincpu);

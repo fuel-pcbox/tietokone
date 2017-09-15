@@ -7,8 +7,8 @@ void add_b_rmw_a16(cpu* maincpu)
     maincpu->fetch_ea_16(modrm);
     if(maincpu->mod == 3)
     {
-        u8 src = maincpu->regs[maincpu->rm].b[0];
-        u8 dst = maincpu->regs[maincpu->reg].b[0];
+        u8 src = maincpu->get_ea_b(maincpu->rm);
+        u8 dst = maincpu->get_ea_b(maincpu->reg);
 		u16 tmp = src + dst;
         maincpu->setznp8(src + dst);
 		if(tmp & 0x100) maincpu->flags |= 1;
@@ -17,12 +17,13 @@ void add_b_rmw_a16(cpu* maincpu)
 		else maincpu->flags &= ~0x10;
 		if((s16)tmp > 127 || (s16)tmp < -128) maincpu->flags |= 0x800;
 		else maincpu->flags &= ~0x800;
-        maincpu->regs[maincpu->rm].b[0] = src + dst;
+        if(!(maincpu->rm & 4)) maincpu->regs[maincpu->rm & 3].b[0] = src + dst;
+        else maincpu->regs[maincpu->rm & 3].b[1] = src + dst;
     }
     else
     {
         u8 src = cpu_readbyte(maincpu->ea_seg_base + maincpu->ea_addr);
-        u8 dst = maincpu->regs[maincpu->reg].b[0];
+        u8 dst = maincpu->get_ea_b(maincpu->reg);
 		u16 tmp = src + dst;
         maincpu->setznp8(src + dst);
 		if(tmp & 0x100) maincpu->flags |= 1;
@@ -32,6 +33,27 @@ void add_b_rmw_a16(cpu* maincpu)
 		if((s16)tmp > 127 || (s16)tmp < -128) maincpu->flags |= 0x800;
 		else maincpu->flags &= ~0x800;
         cpu_writebyte(maincpu->ea_seg_base + maincpu->ea_addr, src + dst);
+    }
+    maincpu->ip+=2;
+}
+
+void or_w_rm_a16(cpu* maincpu)
+{
+    u8 modrm = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    maincpu->fetch_ea_16(modrm);
+    if(maincpu->mod == 3)
+    {
+        u16 src = maincpu->regs[maincpu->rm].w;
+        u16 dst = maincpu->regs[maincpu->reg].w;
+        maincpu->setznp16(src | dst);
+        maincpu->regs[maincpu->reg].w = src | dst;
+    }
+    else
+    {
+        u16 src = cpu_readbyte(maincpu->ea_seg_base + maincpu->ea_addr);
+        u16 dst = maincpu->regs[maincpu->reg].w;
+        maincpu->setznp16(src | dst);
+        cpu_writeword(maincpu->ea_seg_base + maincpu->ea_addr, src | dst);
     }
     maincpu->ip+=2;
 }
@@ -52,6 +74,49 @@ void xor_w_rmw_a16(cpu* maincpu)
         u16 src = cpu_readword(maincpu->ea_seg_base + maincpu->ea_addr);
         u16 dst = maincpu->regs[maincpu->reg].w;
 		maincpu->setznp16(src ^ dst);
+        cpu_writeword(maincpu->ea_seg_base + maincpu->ea_addr, src ^ dst);
+    }
+    maincpu->ip+=2;
+}
+
+void xor_b_rm_a16(cpu* maincpu)
+{
+    u8 modrm = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    maincpu->fetch_ea_16(modrm);
+    if(maincpu->mod == 3)
+    {
+        u8 src = maincpu->get_ea_b(maincpu->rm);
+        u8 dst = maincpu->get_ea_b(maincpu->reg);
+        maincpu->setznp8(src ^ dst);
+        if(!(maincpu->rm & 4)) maincpu->regs[maincpu->reg & 3].b[0] = src ^ dst;
+        else maincpu->regs[maincpu->reg & 3].b[1] = src ^ dst;
+    }
+    else
+    {
+        u8 src = cpu_readbyte(maincpu->ea_seg_base + maincpu->ea_addr);
+        u8 dst = maincpu->get_ea_b(maincpu->reg);
+        maincpu->setznp8(src ^ dst);
+        cpu_writebyte(maincpu->ea_seg_base + maincpu->ea_addr, src ^ dst);
+    }
+    maincpu->ip+=2;
+}
+
+void xor_w_rm_a16(cpu* maincpu)
+{
+    u8 modrm = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    maincpu->fetch_ea_16(modrm);
+    if(maincpu->mod == 3)
+    {
+        u16 src = maincpu->regs[maincpu->rm].w;
+        u16 dst = maincpu->regs[maincpu->reg].w;
+        maincpu->setznp16(src ^ dst);
+        maincpu->regs[maincpu->reg].w = src ^ dst;
+    }
+    else
+    {
+        u16 src = cpu_readbyte(maincpu->ea_seg_base + maincpu->ea_addr);
+        u16 dst = maincpu->regs[maincpu->reg].w;
+        maincpu->setznp16(src ^ dst);
         cpu_writeword(maincpu->ea_seg_base + maincpu->ea_addr, src ^ dst);
     }
     maincpu->ip+=2;
@@ -81,23 +146,24 @@ void grp2_eb_1(cpu* maincpu)
             maincpu->fetch_ea_16(modrm);
             if(maincpu->mod == 3)
             {
-                u16 src = maincpu->regs[maincpu->rm].w;
-                maincpu->setznp16(src << maincpu->CX.b[0]);
+                u8 src = maincpu->get_ea_b(maincpu->rm);
+                maincpu->setznp8(src << 1);
                 if(src& 0x80) maincpu->flags |= 1;
                 else maincpu->flags &= ~1;
                 if((src & 0x80) ^ ((src & 0x40) << 1)) maincpu->flags |= 0x800;
                 else maincpu->flags &= ~0x800;
-                maincpu->regs[maincpu->rm].w = src << maincpu->CX.b[0];
+                if(!(maincpu->rm & 4)) maincpu->regs[maincpu->rm & 3].b[0] = src >> 1;
+                else maincpu->regs[maincpu->rm & 3].b[1] = src >> 1;
             }
             else
             {
-                u16 src = cpu_readword(maincpu->ea_seg_base + maincpu->ea_addr);
-		        maincpu->setznp16(src << maincpu->CX.b[0]);
+                u8 src = cpu_readbyte(maincpu->ea_seg_base + maincpu->ea_addr);
+		        maincpu->setznp8(src << 1);
                 if(src & 0x80) maincpu->flags |= 1;
                 else maincpu->flags &= ~1;
                 if((src & 0x80) ^ ((src & 0x40) << 1)) maincpu->flags |= 0x800;
                 else maincpu->flags &= ~0x800;
-                cpu_writeword(maincpu->ea_seg_base + maincpu->ea_addr, src << maincpu->CX.b[0]);
+                cpu_writebyte(maincpu->ea_seg_base + maincpu->ea_addr, src << 1);
             }
             break;
         }
@@ -106,23 +172,24 @@ void grp2_eb_1(cpu* maincpu)
             maincpu->fetch_ea_16(modrm);
             if(maincpu->mod == 3)
             {
-                u16 src = maincpu->regs[maincpu->rm].w;
-                maincpu->setznp16(src >> 1);
+                u8 src = maincpu->get_ea_b(maincpu->rm);
+                maincpu->setznp8(src >> 1);
                 if(src & 1) maincpu->flags |= 1;
                 else maincpu->flags &= ~1;
                 if(src & 0x80) maincpu->flags |= 0x800;
                 else maincpu->flags &= ~0x800;
-                maincpu->regs[maincpu->rm].w = src >> 1;
+                if(!(maincpu->rm & 4)) maincpu->regs[maincpu->rm & 3].b[0] = src >> 1;
+                else maincpu->regs[maincpu->rm & 3].b[1] = src >> 1;
             }
             else
             {
-                u16 src = cpu_readword(maincpu->ea_seg_base + maincpu->ea_addr);
-		        maincpu->setznp16(src >> 1);
+                u8 src = cpu_readbyte(maincpu->ea_seg_base + maincpu->ea_addr);
+		        maincpu->setznp8(src >> 1);
                 if(src & 1) maincpu->flags |= 1;
                 else maincpu->flags &= ~1;
                 if(src & 0x80) maincpu->flags |= 0x800;
                 else maincpu->flags &= ~0x800;
-                cpu_writeword(maincpu->ea_seg_base + maincpu->ea_addr, src >> 1);
+                cpu_writebyte(maincpu->ea_seg_base + maincpu->ea_addr, src >> 1);
             }
             break;
         }
@@ -133,6 +200,7 @@ void grp2_eb_1(cpu* maincpu)
 void grp2_eb_cl(cpu* maincpu)
 {
     u8 modrm = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    u8 count = maincpu->CX.b[0] & 31;
     switch(modrm & 0x38)
     {
         case 0x20:
@@ -140,19 +208,20 @@ void grp2_eb_cl(cpu* maincpu)
             maincpu->fetch_ea_16(modrm);
             if(maincpu->mod == 3)
             {
-                u16 src = maincpu->regs[maincpu->rm].w;
-                maincpu->setznp16(src << maincpu->CX.b[0]);
-                if((src << (maincpu->CX.b[0] - 1)) & 0x80) maincpu->flags |= 1;
+                u8 src = maincpu->get_ea_b(maincpu->rm);
+                maincpu->setznp8(src << count);
+                if((src << (count - 1)) & 0x80) maincpu->flags |= 1;
                 else maincpu->flags &= ~1;
-                maincpu->regs[maincpu->rm].w = src << maincpu->CX.b[0];
+                if(!(maincpu->rm & 4)) maincpu->regs[maincpu->rm & 3].b[0] = src << count;
+                else maincpu->regs[maincpu->rm & 3].b[1] = src << count;
             }
             else
             {
-                u16 src = cpu_readword(maincpu->ea_seg_base + maincpu->ea_addr);
-		        maincpu->setznp16(src << maincpu->CX.b[0]);
-                if((src << (maincpu->CX.b[0] - 1)) & 0x80) maincpu->flags |= 1;
+                u8 src = cpu_readbyte(maincpu->ea_seg_base + maincpu->ea_addr);
+		        maincpu->setznp8(src << count);
+                if((src << (count - 1)) & 0x80) maincpu->flags |= 1;
                 else maincpu->flags &= ~1;
-                cpu_writeword(maincpu->ea_seg_base + maincpu->ea_addr, src << maincpu->CX.b[0]);
+                cpu_writebyte(maincpu->ea_seg_base + maincpu->ea_addr, src << count);
             }
             break;
         }
@@ -161,19 +230,20 @@ void grp2_eb_cl(cpu* maincpu)
             maincpu->fetch_ea_16(modrm);
             if(maincpu->mod == 3)
             {
-                u16 src = maincpu->regs[maincpu->rm].w;
-                maincpu->setznp16(src >> maincpu->CX.b[0]);
-                if((src >> (maincpu->CX.b[0] - 1)) & 1) maincpu->flags |= 1;
+                u8 src = maincpu->get_ea_b(maincpu->rm);
+                maincpu->setznp8(src >> count);
+                if((src >> (count - 1)) & 1) maincpu->flags |= 1;
                 else maincpu->flags &= ~1;
-                maincpu->regs[maincpu->rm].w = src >> maincpu->CX.b[0];
+                if(!(maincpu->rm & 4)) maincpu->regs[maincpu->rm & 3].b[0] = src >> count;
+                else maincpu->regs[maincpu->rm & 3].b[1] = src >> count;
             }
             else
             {
-                u16 src = cpu_readword(maincpu->ea_seg_base + maincpu->ea_addr);
-		        maincpu->setznp16(src >> maincpu->CX.b[0]);
-                if((src >> (maincpu->CX.b[0] - 1)) & 1) maincpu->flags |= 1;
+                u8 src = cpu_readbyte(maincpu->ea_seg_base + maincpu->ea_addr);
+		        maincpu->setznp8(src >> count);
+                if((src >> (count - 1)) & 1) maincpu->flags |= 1;
                 else maincpu->flags &= ~1;
-                cpu_writeword(maincpu->ea_seg_base + maincpu->ea_addr, src >> maincpu->CX.b[0]);
+                cpu_writebyte(maincpu->ea_seg_base + maincpu->ea_addr, src >> count);
             }
             break;
         }

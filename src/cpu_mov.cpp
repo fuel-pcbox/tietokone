@@ -45,12 +45,12 @@ void mov_r_w_a16(cpu* maincpu)
     {
         u16 dst = maincpu->regs[maincpu->rm].w;
         u16 src = maincpu->regs[maincpu->reg].w;
-        maincpu->regs[maincpu->rm].w = dst;
+        maincpu->regs[maincpu->reg].w = dst;
     }
     else
     {
-        u16 src = maincpu->regs[maincpu->reg].w;
-        cpu_writeword(maincpu->ea_seg_base + maincpu->ea_addr, src);
+        u16 dst = maincpu->regs[maincpu->rm].w;
+        cpu_writeword(maincpu->ea_seg_base + maincpu->ea_addr, dst);
     }
     maincpu->ip+=2;
 }
@@ -200,4 +200,22 @@ void mov_di_imm(cpu* maincpu)
     u16 tmp = cpu_readword(maincpu->cs + maincpu->ip + 1);
     maincpu->DI.w = tmp;
     maincpu->ip+=3;
+}
+
+void mov_w_imm_a16(cpu* maincpu)
+{
+    u8 modrm = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    maincpu->fetch_ea_16(modrm);
+    if(maincpu->mod == 3)
+    {
+        u16 src = maincpu->regs[maincpu->rm].w;
+        u16 dst = cpu_readword(maincpu->cs + maincpu->ip + 1);
+        maincpu->regs[maincpu->rm].w = dst;
+    }
+    else
+    {
+        u16 dst = cpu_readword(maincpu->cs + maincpu->ip + 1);
+        cpu_writeword(maincpu->ea_seg_base + maincpu->ea_addr, dst);
+    }
+    maincpu->ip+=2;
 }

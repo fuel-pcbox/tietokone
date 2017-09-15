@@ -20,6 +20,19 @@ void lahf(cpu* maincpu)
     maincpu->ip+=1;
 }
 
+void clc(cpu* maincpu)
+{
+    maincpu->flags &= 0xfffffffe;
+    maincpu->ip+=1;
+}
+
+
+void stc(cpu* maincpu)
+{
+    maincpu->flags |= 0x00000001;
+    maincpu->ip+=1;
+}
+
 void cli(cpu* maincpu)
 {
     maincpu->flags &= 0xfffffdff;

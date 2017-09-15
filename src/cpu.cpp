@@ -9,8 +9,11 @@ struct cpu_op_template
 
 static cpu_op_template optbl_16d_16a[] =
 {
-	{0x00, add_b_rmw_a16},
+    {0x00, add_b_rmw_a16},
+    {0x0b, or_w_rm_a16},
     {0x31, xor_w_rmw_a16},
+    {0x32, xor_b_rm_a16},
+    {0x33, xor_w_rm_a16},
     {0x3c, cmp_al_imm},
 	{0x70, jump_if_o},
     {0x71, jump_if_no},
@@ -49,6 +52,7 @@ static cpu_op_template optbl_16d_16a[] =
     {0xbd, mov_bp_imm},
     {0xbe, mov_si_imm},
     {0xbf, mov_di_imm},
+    {0xc7, mov_w_imm_a16},
     {0xd0, grp2_eb_1},
     {0xd2, grp2_eb_cl},
     {0xe4, in_al_imm},
@@ -58,6 +62,12 @@ static cpu_op_template optbl_16d_16a[] =
     {0xe9, jmp_r16},
     {0xea, jmp_far_a16},
     {0xeb, jmp_r8},
+    {0xec, in_al_dx},
+    {0xed, in_ax_dx},
+    {0xee, out_al_dx},
+    {0xef, out_ax_dx},
+    {0xf8, clc},
+    {0xf9, stc},
     {0xfa, cli},
     {0xfc, cld},
 };
@@ -184,6 +194,12 @@ void cpu::fetch_ea_16(u8 modrm)
             ea_seg_base = *modseg[rm];
         }
     }
+}
+
+u8 cpu::get_ea_b(int which_reg)
+{
+    if(mod == 3) return (which_reg & 4) ? regs[which_reg & 3].b[1] : regs[which_reg & 3].b[0];
+    return cpu_readbyte(ea_seg_base + ea_addr);
 }
 
 void cpu::setznp8(u8 val)

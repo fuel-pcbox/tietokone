@@ -28,3 +28,27 @@ void out_ax_imm(cpu* maincpu)
     cpu_iowriteword(tmp, maincpu->AX.w);
     maincpu->ip+=2;
 }
+
+void in_al_dx(cpu* maincpu)
+{
+    maincpu->AX.b[0] = cpu_ioreadbyte(maincpu->DX.w);
+    maincpu->ip++;
+}
+
+void in_ax_dx(cpu* maincpu)
+{
+    maincpu->AX.w = cpu_ioreadword(maincpu->DX.w);
+    maincpu->ip++;
+}
+
+void out_al_dx(cpu* maincpu)
+{
+    cpu_iowritebyte(maincpu->DX.w, maincpu->AX.b[0]);
+    maincpu->ip++;
+}
+
+void out_ax_dx(cpu* maincpu)
+{
+    cpu_iowriteword(maincpu->DX.w, maincpu->AX.w);
+    maincpu->ip++;
+}

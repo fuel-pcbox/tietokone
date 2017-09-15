@@ -135,7 +135,7 @@ int main(int ac, char** av)
     {
         if(args.size() < 1) return;
         u8 tmp = cpu_readbyte(strtoull(args[0].c_str(),nullptr,16));
-        printf("The byte at address %llux is %02x\n", strtoull(args[0].c_str(),nullptr,16), tmp);
+        printf("The byte at address %llu is %02x\n", strtoull(args[0].c_str(),nullptr,16), tmp);
     });
 
     new Command("pokeb", "Writes a byte in the emulated processor's address space", [&] (std::vector<std::string> args)
