@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -98,6 +98,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\attotime.cpp" />
     <ClCompile Include="src\cpu.cpp" />
     <ClCompile Include="src\cpu_arith.cpp" />
     <ClCompile Include="src\cpu_io.cpp" />
@@ -110,9 +111,12 @@
     <ClCompile Include="src\mem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\attotime.h" />
     <ClInclude Include="src\commands.h" />
     <ClInclude Include="src\common.h" />
     <ClInclude Include="src\cpu.h" />
+    <ClInclude Include="src\eminline.h" />
+    <ClInclude Include="src\emucore.h" />
     <ClInclude Include="src\keyboard.h" />
     <ClInclude Include="src\log.h" />
     <ClInclude Include="src\mem.h" />
