@@ -262,3 +262,5 @@ inline uint8_t count_leading_ones(uint32_t val)
 	return count;
 }
 #endif
+
+#endif //MAME_OSD_EMINLINE_H
