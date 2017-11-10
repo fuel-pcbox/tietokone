@@ -125,3 +125,5 @@ const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_LITTLE;
 #else
 const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_BIG;
 #endif
+
+#endif //MAME_EMU_EMUCORE_H

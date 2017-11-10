@@ -8,6 +8,8 @@
 #include <cstdlib>
 #include <iostream>
 #include <climits>
+#include <cmath>
+#include <cassert>
 #include "log.h"
 
 typedef uint8_t u8;

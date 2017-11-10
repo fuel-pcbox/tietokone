@@ -35,7 +35,9 @@
 
 #pragma once
 
-#include <math.h>
+#include "common.h"
+#include "emucore.h"
+#include "eminline.h"
 #undef min
 #undef max
 

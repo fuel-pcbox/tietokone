@@ -1,4 +1,5 @@
 #include "common.h"
+#include "attotime.h"
 #include "mem.h"
 #include "cpu.h"
 #include "commands.h"
@@ -18,6 +19,11 @@ int main(int ac, char** av)
 {
     cpu maincpu;
 	machinetype machine;
+
+    double cpuclock;
+
+    attotime cpu_atto;
+    attotime current_time;
 
     printf("Tietokone PC Emulator by the Tietokone Team\n");
     Command::loadCLI();
@@ -96,15 +102,24 @@ int main(int ac, char** av)
 		}
 	});
 
+    new Command("clock", "Sets the clock speed of the emulated processor", [&](std::vector<std::string> args)
+    {
+        if(args.size() < 1) return;
+        cpuclock = strtod(args[0].c_str(), nullptr);
+        cpu_atto = attotime::from_hz(cpuclock);
+    });
+
     new Command("run", "Runs the emulated processor", [&] (std::vector<std::string> args)
     {
-        for(int i = 0; i<50; i++)
+        for(;;)
         {
+            if(current_time > 50*cpu_atto) return;
             for(auto bp : breakpoints)
             {
                 if((maincpu.cs + maincpu.ip) == bp) return;
             }
             maincpu.tick();
+            current_time += cpu_atto;
             if(watchpoint_hit)
             {
                 watchpoint_hit = false;
