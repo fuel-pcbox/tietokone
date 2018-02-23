@@ -70,6 +70,7 @@ static cpu_op_template optbl_16d_16a[] =
     {0xf9, stc},
     {0xfa, cli},
     {0xfc, cld},
+    {0xfe, grp4_eb},
 };
 
 void cpu::init()

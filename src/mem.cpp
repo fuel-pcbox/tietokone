@@ -224,7 +224,7 @@ void cpu_iowritebyte(u64 addr, u8 data)
     {
         if(addr>=iohandlers[i].start && addr<=iohandlers[i].end)
         {
-            iohandlers[i].wb(addr-iohandlers[i].start, data);
+            if(iohandlers[i].wb != nullptr) iohandlers[i].wb(addr-iohandlers[i].start, data);
             return;
         }
     }
@@ -241,7 +241,7 @@ void cpu_iowriteword(u64 addr, u16 data)
     {
         if(addr>=iohandlers[i].start && (addr+1)<=iohandlers[i].end)
         {
-            iohandlers[i].ww(addr-iohandlers[i].start, data);
+            if(iohandlers[i].ww != nullptr) iohandlers[i].ww(addr-iohandlers[i].start, data);
             return;
         }
     }
@@ -258,7 +258,7 @@ void cpu_iowritelong(u64 addr, u32 data)
     {
         if(addr>=iohandlers[i].start && (addr+3)<=iohandlers[i].end)
         {
-            iohandlers[i].wl(addr-iohandlers[i].start, data);
+            if(iohandlers[i].wl != nullptr) iohandlers[i].wl(addr-iohandlers[i].start, data);
             return;
         }
     }

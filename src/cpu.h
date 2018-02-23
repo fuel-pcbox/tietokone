@@ -35,6 +35,7 @@ struct cpu
 
     union x86reg
     {
+		u64 q;
         u32 l;
         u16 w;
         u8 b[2];
@@ -145,3 +146,4 @@ void clc(cpu* maincpu);
 void stc(cpu* maincpu);
 void cli(cpu* maincpu);
 void cld(cpu* maincpu);
+void grp4_eb(cpu* maincpu);

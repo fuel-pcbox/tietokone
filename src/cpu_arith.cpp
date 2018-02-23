@@ -250,3 +250,48 @@ void grp2_eb_cl(cpu* maincpu)
     }
     maincpu->ip+=2;
 }
+
+void grp4_eb(cpu* maincpu)
+{
+    u8 modrm = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
+    switch(modrm & 0x38)
+    {
+        case 0x00:
+        {
+            maincpu->fetch_ea_16(modrm);
+            if(maincpu->mod == 3)
+            {
+                u8 src = maincpu->get_ea_b(maincpu->rm);
+                maincpu->setznp8(src + 1);
+                if(!(maincpu->rm & 4)) maincpu->regs[maincpu->rm & 3].b[0] = src + 1;
+                else maincpu->regs[maincpu->rm & 3].b[1] = src + 1;
+            }
+            else
+            {
+                u8 src = cpu_readbyte(maincpu->ea_seg_base + maincpu->ea_addr);
+		        maincpu->setznp8(src + 1);
+                cpu_writebyte(maincpu->ea_seg_base + maincpu->ea_addr, src + 1);
+            }
+            break;
+        }
+        case 0x08:
+        {
+            maincpu->fetch_ea_16(modrm);
+            if(maincpu->mod == 3)
+            {
+                u8 src = maincpu->get_ea_b(maincpu->rm);
+                maincpu->setznp8(src - 1);
+                if(!(maincpu->rm & 4)) maincpu->regs[maincpu->rm & 3].b[0] = src - 1;
+                else maincpu->regs[maincpu->rm & 3].b[1] = src - 1;
+            }
+            else
+            {
+                u8 src = cpu_readbyte(maincpu->ea_seg_base + maincpu->ea_addr);
+		        maincpu->setznp8(src - 1);
+                cpu_writebyte(maincpu->ea_seg_base + maincpu->ea_addr, src - 1);
+            }
+            break;
+        }
+    }
+    maincpu->ip+=2;
+}

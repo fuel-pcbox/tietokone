@@ -23,7 +23,7 @@ int main(int ac, char** av)
     double cpuclock;
 
     attotime cpu_atto;
-    attotime current_time;
+    attotime current_time = attotime::zero;
 
     printf("Tietokone PC Emulator by the Tietokone Team\n");
     Command::loadCLI();
@@ -113,7 +113,7 @@ int main(int ac, char** av)
     {
         for(;;)
         {
-            if(current_time > 50*cpu_atto) return;
+            if(current_time > 200*cpu_atto) return;
             for(auto bp : breakpoints)
             {
                 if((maincpu.cs + maincpu.ip) == bp) return;
