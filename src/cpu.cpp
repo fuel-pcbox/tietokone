@@ -10,7 +10,9 @@ struct cpu_op_template
 static cpu_op_template optbl_16d_16a[] =
 {
     {0x00, add_b_rmw_a16},
+    {0x05, add_ax_imm},
     {0x0b, or_w_rm_a16},
+    {0x2d, sub_ax_imm},
     {0x31, xor_w_rmw_a16},
     {0x32, xor_b_rm_a16},
     {0x33, xor_w_rm_a16},

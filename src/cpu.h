@@ -86,7 +86,9 @@ struct cpu
 void unknown(cpu* maincpu);
 
 void add_b_rmw_a16(cpu* maincpu);
+void add_ax_imm(cpu* maincpu);
 void or_w_rm_a16(cpu* maincpu);
+void sub_ax_imm(cpu* maincpu);
 void xor_w_rmw_a16(cpu* maincpu);
 void xor_b_rm_a16(cpu* maincpu);
 void xor_w_rm_a16(cpu* maincpu);

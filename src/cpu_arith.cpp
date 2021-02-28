@@ -37,6 +37,21 @@ void add_b_rmw_a16(cpu* maincpu)
     maincpu->ip+=2;
 }
 
+void add_ax_imm(cpu* maincpu)
+{
+    u16 src = cpu_readword(maincpu->cs + maincpu->ip + 1);
+    u16 dst = maincpu->AX.w;
+    u32 tmp = src + dst;
+    maincpu->setznp16(tmp);
+	if(tmp & 0x10000) maincpu->flags |= 1;
+	else maincpu->flags &= ~1;
+	if(((src & 0x0f) + (dst & 0x0f)) & 0x10) maincpu->flags |= 0x10;
+	else maincpu->flags &= ~0x10;
+	if((s16)tmp > 0xffff || (s16)tmp < 0x8000) maincpu->flags |= 0x800;
+	else maincpu->flags &= ~0x800;
+    maincpu->ip+=3;
+}
+
 void or_w_rm_a16(cpu* maincpu)
 {
     u8 modrm = cpu_readbyte(maincpu->cs + maincpu->ip + 1);
@@ -56,6 +71,21 @@ void or_w_rm_a16(cpu* maincpu)
         cpu_writeword(maincpu->ea_seg_base + maincpu->ea_addr, src | dst);
     }
     maincpu->ip+=2;
+}
+
+void sub_ax_imm(cpu* maincpu)
+{
+    u16 src = cpu_readword(maincpu->cs + maincpu->ip + 1);
+    u16 dst = maincpu->AX.w;
+    u32 tmp = src - dst;
+    maincpu->setznp16(tmp);
+	if(tmp & 0x10000) maincpu->flags |= 1;
+	else maincpu->flags &= ~1;
+	if(((src & 0x0f) + (dst & 0x0f)) & 0x10) maincpu->flags |= 0x10;
+	else maincpu->flags &= ~0x10;
+	if((s16)tmp > 0xffff || (s16)tmp < 0x8000) maincpu->flags |= 0x800;
+	else maincpu->flags &= ~0x800;
+    maincpu->ip+=3;
 }
 
 void xor_w_rmw_a16(cpu* maincpu)
